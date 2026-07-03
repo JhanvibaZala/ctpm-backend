@@ -3,50 +3,41 @@ import { LoginService } from "../services/login.service";
 import { RefreshRepository } from "../repository/refreshTokens.repository";
 import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
+import { LoginDto } from "../dto/login.dto";
 
 const ACCESS_SECRET=process.env.JWT_ACCESS_SECRET as string;
 const REFRESH_SECRET=process.env.JWT_REFRESH_SECRET as string;
 
-export const showLoginPage = async (req: Request, res: Response) => {
-    res.render("auth/login",{ query: req.query, error: null, form: {} })
-}
-
-export const login_user = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
     // Extract early so we can pass the email back to the view on failure
-    const { email, password ,remember_me} = req.body;
+    const { email, password, rememberMe }: LoginDto = req.body;
 
     try {
         const loginService = new LoginService();
         const refreshRepo =new RefreshRepository();
 
-        // 1. Basic sanity check (Traffic Layer)
-        if (typeof email !== "string" || !email) {
-            return res.status(400).render("auth/login", {
-                error: "Please provide a valid email format.",
-                form: { email } // Notice we only pass the email back, NOT the password
-            });
-        }
-
-        // 2. Validate credentials (Logic Layer)
+        // 1. Validate credentials (Logic Layer)
         // Remember: Our service returns the user object on success, or null on failure
-        const valid_user = await loginService.check_credentials(email, password);
+        const user = await loginService.authenticateUser(email, password);
         // 3. Handle Failure
-        if (!valid_user) {
-            return res.status(401).render("auth/login", {
-                error: "Invalid email or password.", 
-                form: { email } 
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                errors: [{
+                    field:"password",
+                    message: "Invalid email or password"
+                }]
             });
         }
 
-        const valid_user_obj = valid_user[0]
 
         const payload = {
-            id: valid_user_obj!.id,
-            email: valid_user_obj!.email_id,
-            username: valid_user_obj!.username
+            id: user!.id,
+            email: user!.email_id,
+            username: user!.username
         }
 
-        const isRemembered = remember_me === "on";
+        const isRemembered = rememberMe === "on";
         const refreshExpiry = isRemembered ? "30d" : "7d";
         const refreshCookieAge = isRemembered
             ? 30 * 24 * 60 * 60 * 1000   // 30 days
@@ -70,9 +61,9 @@ export const login_user = async (req: Request, res: Response) => {
             ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-        const hashed_ref_token=await bcrypt.hash(refreshToken,10);
+        const hashed_ref_token = await bcrypt.hash(refreshToken,10);
         // OPTIONAL BUT RECOMMENDED: Save refresh token to DB via Repository
-        await refreshRepo.storeRefreshToken(valid_user_obj!.id as string, hashed_ref_token, expiresAt);
+        await refreshRepo.storeRefreshToken(user!.id as string, hashed_ref_token, expiresAt);
 
         // 4. Set Access Token Cookie
         res.cookie('access_token', accessToken, {
@@ -91,21 +82,26 @@ export const login_user = async (req: Request, res: Response) => {
         });
 
 
-        return res.redirect("/dashboard/workspaces");
+        return res.status(200).json({
+            success: true,
+            message: "Login successfully",
+            user: {
+                id: user.id,
+                email: user.email,
+                username: user.username
+            }
+        })
 
     } catch (err) {
         console.log(err);
         
         // Never send raw err.message to the frontend in a 500 crash
-        return res.status(500).render("auth/login", {
-            error: "Something went wrong on our end. Please try again.",
-            form: { email }
-        });
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
     }
 }
-
-
-
 
 export const getUserDetails = async (req: Request, res: Response) => {
     const email = req.params.email 
@@ -117,7 +113,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
                 message: "invalid email"
             })
         }
-        const user = await loginService.check_email(email);
+        const user = await loginService.findUserByEmail(email);
         if(!user) {
             console.log("not found")
             return res.status(401).json({

@@ -4,7 +4,7 @@ import { IUser } from "../interfaces/user_obj.interface";
 
 export class LoginRepository {
     // check if email exists in the database
-    async fetchUserDetails(email: string): Promise<RowDataPacket[]> {
+    async findUserByEmail(email: string): Promise<RowDataPacket[]> {
         try {
             const sql = `select * from users where email_id = ?`;
             const [rows] = await db.execute<RowDataPacket[]>(sql, [email]);

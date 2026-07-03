@@ -1,6 +1,5 @@
 import { LoginRepository } from "../repository/login.repository";
 import bcrypt from "bcrypt"
-import crypto from "crypto"
 import {v4 as uuidv4, v4} from "uuid"
 import { OtpRepository } from "../repository/otp.repository";
 import { validatePassword } from "../validation/validations";
@@ -12,30 +11,30 @@ export class LoginService {
     private otpRepo = new OtpRepository();
 
     // check the credentials of user
-    async check_credentials(email: string, password: string) {
+    async authenticateUser(email: string, password: string) {
         try {
-            const user_details = await this.loginRepo.fetchUserDetails(email);
+            const user_details = await this.loginRepo.findUserByEmail(email);
 
-            if(user_details.length < 1) {
-                return false
+            if(user_details.length === 0) {
+                return null 
             }
             
             // check password
-            const is_password_valid = await bcrypt.compare(password, (user_details as any)[0].hashed_password);
-            if(!is_password_valid) {
-                return false
+            const validPassword = await bcrypt.compare(password, (user_details as any)[0].hashed_password);
+            if(!validPassword) {
+                return null
             }
 
-            return user_details;
+            return user_details[0];
 
         } catch (error) {
             console.log(error)
             throw error;
         }
     }
-async getUserByEmail(email:string){
+    async getUserByEmail(email:string){
         try{
-            const user_details = await this.loginRepo.fetchUserDetails(email);
+            const user_details = await this.loginRepo.findUserByEmail(email);
               if(user_details.length < 1) {
                 return []
             }
@@ -49,7 +48,7 @@ async getUserByEmail(email:string){
 
 
     // In LoginService — change check_email to return the user row
-    async check_email(emailOrUsername: string): Promise<{ email_id: string } | null> {
+    async findUserByEmail(emailOrUsername: string): Promise<{ email_id: string } | null> {
         return await this.loginRepo.findByEmailOrUsername(emailOrUsername);
     }
 
@@ -130,7 +129,7 @@ async getUserByEmail(email:string){
             const decoded: any = verifyResetToken(reset_obj.token || "");
 
             // get user
-            const user: any = await this.loginRepo.fetchUserDetails(decoded.email);
+            const user: any = await this.loginRepo.findUserByEmail(decoded.email);
 
             // compare the old password
             const isSame = await bcrypt.compare(reset_obj.password || "", user[0].hashed_password);

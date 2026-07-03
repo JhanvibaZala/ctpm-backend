@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { getUserDetails, login_user, showLoginPage } from "../controller/login.controller";
-import { Routes } from "../../../common/interfaces/index.interface";
+import { getUserDetails, loginUser } from "../controller/login.controller";
 
 
 const router = Router();
 
-router.get("/", showLoginPage)
-router.post("/", login_user)
+router.post("/", loginUser)
 router.get("/checkUser/:email", getUserDetails)
 
 export default router;
