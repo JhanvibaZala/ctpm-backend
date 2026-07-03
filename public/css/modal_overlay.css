@@ -1,0 +1,113 @@
+/* Modal Background (Overlay) */
+.modal-overlay {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Dimmed background */
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content Box */
+.modal-overlay .modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Header */
+.modal-overlay .modal-header {
+    margin-bottom: 20px;
+}
+
+.modal-overlay .modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 22px;
+}
+
+/* Form Groups */
+.modal-overlay .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-overlay .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 600;
+}
+
+.modal-overlay .form-group input,
+.modal-overlay .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    /* Ensures padding doesn't affect width */
+}
+
+.modal-overlay .form-group textarea {
+    resize: vertical;
+    height: 80px;
+}
+
+/* Submit Button - Specific Color Requirements */
+.modal-overlay .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #2062d5;
+    /* Requested Background */
+    color: white;
+    /* Requested Text Color */
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-overlay .submit-btn:hover {
+    background-color: #164a9e;
+    /* Slightly darker on hover */
+}
+
+/* Close Button (X icon) */
+.modal-overlay .close-icon {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.modal-overlay .close-icon:hover {
+    color: #333;
+}

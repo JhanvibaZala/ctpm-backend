@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= monthLabel %> <%= year %> · Calendar</title>
+  <link rel="stylesheet" href="/css/calendar.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="/css/project-navbar.css">
+      <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+</head>
+<body>
+  
+    <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+
+<div class="main-container">
+
+  <!-- KEEP EXISTING SIDEBAR (NO CHANGE) -->
+  <div>
+    <%- include('../common/sidebar') %>
+  </div>
+
+  <!-- PAGE CONTENT AREA -->
+  <div class="page">
+
+    <!-- KEEP EXISTING NAVBAR (NO CHANGE) -->
+    <%- include('../common/navbar') %>
+
+    <!-- CALENDAR CONTENT START -->
+    <div class="calendar-wrapper">
+        <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title"><%= monthLabel %> <span class="page-year"><%= year %></span></h1>
+      <% if (year !== today.year || month !== today.month) { %>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar?year=<%= today.year %>&month=<%= today.month %>" class="today-btn">Today</a>
+      <% } %>
+    </div>
+
+    <div class="topbar-right">
+      <!-- View toggle -->
+      <div class="view-toggle">
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar?year=<%= year %>&month=<%= month %>&view=month"
+           class="view-btn<%= view === 'month' ? ' active' : '' %>">Month</a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar?year=<%= year %>&month=<%= month %>&view=list"
+           class="view-btn<%= view === 'list' ? ' active' : '' %>">List</a>
+      </div>
+
+      <!-- Month nav -->
+      <div class="month-nav">
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar?year=<%= prev.year %>&month=<%= prev.month %>"
+           class="nav-arrow" aria-label="Previous month">&#8249;</a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar?year=<%= next.year %>&month=<%= next.month %>"
+           class="nav-arrow" aria-label="Next month">&#8250;</a>
+      </div>
+    </div>
+  </header>
+
+    <!-- ── MONTH VIEW ────────────────────────────────────────── -->
+  <% if (view === 'month') { %>
+
+  <div class="calendar-grid" id="calendar-grid">
+    <!-- Day-of-week headers -->
+    <div class="dow-row">
+      <% ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].forEach(d => { %>
+        <div class="dow-cell"><%= d %></div>
+      <% }) %>
+    </div>
+
+    <!-- Weeks -->
+    <% weeks.forEach(week => { %>
+    <div class="week-row">
+      <% week.forEach(day => { %>
+        <%
+          const isToday   = day && year === today.year && month === today.month && day === today.day;
+          const dayTasks  = (day && taskMap[day]) ? taskMap[day] : [];
+          const overflow  = dayTasks.length > 3;
+          const visible   = dayTasks.slice(0, 3);
+        %>
+        <div class="day-cell<%= !day ? ' filler' : '' %><%= isToday ? ' today' : '' %>"
+             id="<%= day ? 'day-' + day : '' %>">
+          <% if (day) { %>
+            <div class="day-number<%= isToday ? ' today-num' : '' %>"><%= day %></div>
+            <div class="day-tasks">
+              <% visible.forEach(task => { %>
+                <%
+                  
+                  const isDone = task.status_text === 'Done';
+                  const isUrgent= task.priority_level === 'Urgent';
+                %>
+                <div class="task-pill<%= isDone ? ' done' : '' %><%= isUrgent && !isDone ? ' urgent' : '' %>"
+                  style="--task-color:#4f46e5"
+                     data-task-id="<%= task.id %>"
+                     title="<%= task.task_name %>">
+                  <span class="pill-dot"></span>
+                  <span class="pill-label"><%= task.task_name %></span>
+                  
+                </div>
+              <% }) %>
+              <% if (overflow) { %>
+                <div class="overflow-badge" data-day="<%= day %>">+<%= dayTasks.length - 3 %> more</div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+    <% }) %>
+  </div>
+
+  <% } %>
+
+  <!-- ── LIST VIEW ─────────────────────────────────────────── -->
+  <% if (view === 'list') { %>
+  <div class="list-view">
+    <% if (tasks.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">◷</div>
+        <div class="empty-title">No tasks this month</div>
+        <div class="empty-sub">Switch to a different month to view tasks.</div>
+      </div>
+    <% } else { %>
+      <%
+        // Group by due date
+        const grouped = {};
+        tasks.filter(t => t.due_at).forEach(t => {
+          const key = t.due_at.toISOString().slice(0,10);
+          if (!grouped[key]) grouped[key] = [];
+          grouped[key].push(t);
+        });
+        const sortedDays = Object.keys(grouped).sort();
+      %>
+      <% sortedDays.forEach(dateKey => { %>
+        <%
+          const d     = new Date(dateKey + 'T12:00:00');
+          const label = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+          const isPast= d < new Date() && dateKey !== new Date().toISOString().slice(0,10);
+        %>
+        <div class="list-day-group">
+          <div class="list-day-label<%= isPast ? ' past' : '' %>">
+            <%= label %>
+            <% if (dateKey === new Date().toISOString().slice(0,10)) { %><span class="today-badge">Today</span><% } %>
+          </div>
+          <div class="list-tasks">
+            <% grouped[dateKey].forEach(task => { %>
+
+              <div class="list-task-row" data-task-id="<%= task.id %>">
+                <span class="list-status-dot status-<%= task.status_text.toLowerCase().replace(' ','-') %>"></span>
+                <span class="list-task-title<%= task.status_text === 'Done' ? ' done' : '' %>"><%= task.task_name %></span>
+
+                
+                <span class="list-priority priority-<%= task.priority_level.toLowerCase() %>"><%= task.priority_level %></span>
+                <span class="list-assignees">
+                  
+                </span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+  <% } %>
+
+</div><!--class calendarwrapper-->
+</div><!--class page-->
+</div><!--main cont-->
+
+
+<!-- ══ TASK DETAIL DRAWER ════════════════════════════════════ -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="task-drawer" id="task-drawer" aria-hidden="true">
+  <div class="drawer-header">
+    <div class="drawer-project-tag" id="drawer-project-tag"></div>
+    <button class="drawer-close" id="drawer-close" aria-label="Close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <h2 class="drawer-title" id="drawer-title">Loading…</h2>
+    <div class="drawer-meta">
+      <div class="drawer-meta-row">
+        <span class="meta-label">Status</span>
+        <span class="meta-value" id="drawer-status"></span>
+      </div>
+      <div class="drawer-meta-row">
+        <span class="meta-label">Priority</span>
+        <span class="meta-value" id="drawer-priority"></span>
+      </div>
+      <div class="drawer-meta-row">
+        <span class="meta-label">Due date</span>
+        <span class="meta-value" id="drawer-due"></span>
+      </div>
+      <div class="drawer-meta-row">
+        <span class="meta-label">Starts</span>
+        <span class="meta-value" id="drawer-start"></span>
+      </div>
+      <div class="drawer-meta-row">
+        <span class="meta-label">Assignees</span>
+        <span class="meta-value" id="drawer-assignees"></span>
+      </div>
+    </div>
+    <div class="drawer-actions">
+      <button class="btn-primary">Open task</button>
+      <button class="btn-ghost">Edit</button>
+    </div>
+  </div>
+</aside>
+
+<script src="/js/calendar.js">  
+window.CALENDAR_CONTEXT = {
+    workspaceId: "<%= workspace_id %>",
+    projectId: "<%= project_id %>"
+  };</script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Task Details</title>
+
+    <link rel="stylesheet" href="/css/task-details.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/deleteTask.css">
+    <link rel="stylesheet" href="/css/subtask.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+        <div class="project-name">
+            Project Variyari
+        </div>
+    </nav>
+
+
+
+    <div class="container">
+
+
+        <!-- Sidebar -->
+        <%- include("../common/sidebar.ejs") %>
+
+            <input type="text" value="<%= workspace_id %>" name="workspaceId" id="workspaceId" hidden>
+            <input type="text" value="<%= project_id %>" name="projectId" id="projectId" hidden>
+            <input type="text" value="<%= task.id %>" name="taskId" id="taskId" hidden>
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+
+                <div class="task-detail-header">
+                    <% if(task.parentId) { %>
+
+                    <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/tasks/<%= task.parentId %>">
+                        <i class="fa-solid fa-angle-left back-arrow"></i>
+                    </a>
+
+                <% } else { %>
+
+                    <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/tasks">
+                        <i class="fa-solid fa-angle-left back-arrow"></i>
+                    </a>
+
+                <% } %>
+                    
+                    
+                    <h2>
+                        Task Details
+                    </h2>
+
+
+                    <div class="action-buttons">
+
+                        <button class="edit-btn" onclick="openEditTaskModal('<%= task.id %>')">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Edit
+                        </button>
+
+
+                        <button class="delete-btn" onclick="openDeleteModal('<%= task.id %>')">
+                            <i class="fa-solid fa-trash"></i>
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="task-card">
+
+
+                    <div class="task-title-section">
+
+                        <h1>
+                            <%= task.taskName %>
+                        </h1>
+
+
+                        <div class="task-meta">
+
+                            <div class="status-container">
+
+                                <label>Status</label>
+
+                                <span class="status-badge">
+                                    <%= task.statusText %>
+                                </span>
+
+                            </div>
+
+
+                            <div class="priority-container">
+
+                                <label>Priority</label>
+
+
+                                <span class="priority-badge <%= task.priorityLevel.toLowerCase() %>">
+
+                                    <%= task.priorityLevel %>
+
+                                </span>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="task-info-grid">
+
+
+
+
+
+
+                        <div class="info-box">
+
+                            <label>
+                                Estimated Hours
+                            </label>
+
+                            <p>
+                                <%= task.estimatedHours %> Hours
+                            </p>
+
+                        </div>
+
+
+
+
+                        <div class="info-box">
+
+                            <label>
+                                Start Date
+                            </label>
+
+                            <p>
+                                <%= task.startDate.toDateString() %>
+                            </p>
+
+                        </div>
+
+
+
+
+                        <div class="info-box">
+
+                            <label>
+                                Due Date
+                            </label>
+
+                            <p>
+                                <%= task.dueAt.toDateString() %>
+                            </p>
+
+                        </div>
+
+
+
+                        <div class="info-box">
+
+                            <label>
+                                Completion
+                            </label>
+
+                            <p>
+                                <%= task.completedAt != null ? "Completed" : "Not Completed" %>
+                            </p>
+
+                        </div>
+
+
+
+
+                        <div class="info-box">
+
+                            <label>
+                                Assigned To
+                            </label>
+
+                            <% assignees.forEach(a=> { %>
+                                <p>
+                                    <%= a.username %>
+                                        <br>
+                                </p>
+                                <% }) %>
+
+                        </div>
+
+
+
+                    </div>
+
+
+
+                    <div class="description-section">
+
+                        <h3>
+                            Description
+                        </h3>
+
+
+                        <p>
+                            <%= task.description || "No description provided" %>
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="attachment-section">
+
+                        <h3>Attachments</h3>
+
+                        <% if(attachments && attachments.length> 0){ %>
+
+                            <div class="attachment-grid">
+
+                                <% attachments.forEach(file=> { %>
+
+                                    <% const extension=file.fileName.split('.').pop().toLowerCase(); %>
+
+                                        <div class="attachment-card">
+
+                                            <% if(["png","jpg","jpeg","gif","webp"].includes(extension)){ %>
+
+                                                <div class="attachment-icon image-file">
+                                                    <i class="fa-solid fa-image"></i>
+                                                </div>
+
+                                                <% } else if(extension==="pdf" ){ %>
+
+                                                    <div class="attachment-icon pdf-file">
+                                                        <i class="fa-solid fa-file-pdf"></i>
+                                                    </div>
+
+                                                    <% } else if(["xls","xlsx","csv"].includes(extension)){ %>
+
+                                                        <div class="attachment-icon excel-file">
+                                                            <i class="fa-solid fa-file-excel"></i>
+                                                        </div>
+
+                                                        <% } else if(["doc","docx"].includes(extension)){ %>
+
+                                                            <div class="attachment-icon doc-file">
+                                                                <i class="fa-solid fa-file-word"></i>
+                                                            </div>
+
+                                                            <% } else { %>
+
+                                                                <div class="attachment-icon other-file">
+                                                                    <i class="fa-solid fa-file"></i>
+                                                                </div>
+
+                                                                <% } %>
+
+                                                                    <div class="attachment-info">
+
+                                                                        <h4>
+                                                                            <%= file.fileName %>
+                                                                        </h4>
+
+                                                                        <a href="/<%= file.filePath %>" target="_blank"
+                                                                            class="attachment-link">
+                                                                            Open File
+                                                                        </a>
+
+                                                                    </div>
+
+                                        </div>
+
+                                        <% }) %>
+
+                            </div>
+
+                            <% } else { %>
+
+                                <p>No attachments uploaded.</p>
+
+                                <% } %>
+
+                    </div>
+                </div>
+
+                <!-- Subtasks Section -->
+
+                <div class="subtasks-section">
+
+                    <div class="subtasks-header">
+                        <h2>Subtasks</h2>
+
+                        <button class="add-subtask-btn" onclick="openSubtaskModal()">
+                            + Add Subtask
+                        </button>
+                    </div>
+
+
+                    <% if(subtasks && subtasks.length> 0){ %>
+
+                        
+                        <% subtasks.forEach(subtask=> { %>
+                            <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/tasks/<%= subtask.id %>" class="subtask-card">
+
+
+                                <!-- <div class="subtask-card"> -->
+
+                                    <div class="subtask-title">
+                                        <%= subtask.taskName %>
+                                    </div>
+
+
+                                    <div class="subtask-info">
+
+                                        <span>
+                                            Status:
+                                            <strong class="status-badge 
+            <%= subtask.statusText.toLowerCase().replace(/\s+/g, '-') %>">
+                                                <%= subtask.statusText %>
+                                            </strong>
+                                        </span>
+
+
+                                        <span>
+                                            Priority:
+                                            <strong class="priority-badge 
+            <%= subtask.priorityLevel.toLowerCase() %>">
+                                                <%= subtask.priorityLevel %>
+                                            </strong>
+                                        </span>
+
+
+                                        <span>
+                                            Due:
+                                            <strong class="due-date">
+                                                <%= subtask.dueAt.toDateString() %>
+                                            </strong>
+                                        </span>
+
+                                    </div>
+
+
+                                <!-- </div> -->
+
+
+                            </a>
+                                <% }) %>
+
+
+
+                        <% } else { %>
+
+
+                            <div class="no-subtask">
+                                No subtasks created yet
+                            </div>
+
+
+                            <% } %>
+
+
+                </div>
+
+            </main>
+
+
+    </div>
+    <%- include("./deleteTaskModal.ejs") %>
+        <%- include("./editTaskModal.ejs") %>
+            <%- include("../subtasks/add.ejs") %>
+                <div id="toast"></div>
+
+</body>
+
+<script src="/js/addSubtask.js"></script>
+<script src="/js/toast.js"></script>
+<script src="/js/editDeleteTask.tasks.js"></script>
+
+</html>

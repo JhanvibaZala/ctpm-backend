@@ -1,0 +1,167 @@
+<!-- Modal Structure -->
+<div id="projectModal" class="modal-overlay">
+    <div class="modal-content">
+
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Create New Project</h2>
+            <div class="workspace-label">In workspace: <strong>Spotify Inc</strong></div>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <form id="projectForm" method="post" action="/api/workspaces/<%=workspace_id%>/projects/creatProject">
+                <!-- Hidden field sent in POST request -->
+                <input type="hidden" name="workspace_id" value="<%= workspace_id %>">
+
+                <!-- Project Name -->
+                <div class="form-group">
+                    <label for="pName">Project Name</label>
+                    <input type="text" id="pName" name="project_name" class="form-control"
+                        placeholder="e.g. Music Streaming App" required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="pDesc">Description</label>
+                    <textarea id="pDesc" name="description" class="form-control"
+                        placeholder="Briefly describe the project..." required></textarea>
+                </div>
+
+                <!-- Status & Priority -->
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="pStatus">Status</label>
+                            <select id="pStatus" name="status" class="form-control">
+                                <option value="Pending">Pending</option>
+                                <option value="WIP">WIP</option>
+                                <option value="On Hold">On Hold</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="pPriority">Priority</label>
+                            <select id="pPriority" name="priority_level" class="form-control">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status & Priority -->
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="pVisibility">Visibility</label>
+                            <select id="pVisibility" name="visibility" class="form-control">
+                                <option value="Public">Public</option>
+                                <option value="Private">Private</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dates -->
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="pStart">Start Date</label>
+                            <input type="date" id="pStart" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="pEnd">End Date</label>
+                            <input type="date" name="deadline_at" id="pEnd" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Lead -->
+                <div class="form-group">
+                    <label for="pLead">Project Lead</label>
+                    <input type="email" id="pLead" class="form-control" name="projectLeadEmail"
+                        value="user.greatstack@gmail.com" required>
+                </div>
+
+                <!-- Team Members -->
+                <div class="form-group">
+                    <label>Team Members</label>
+                    <div class="team-members-box">
+                        <div id="selectedMembers">
+                            <!-- <span class="team-tag">user.greatstack@gmail.com</span> -->
+                        </div>
+                        <br>
+                        <select class="form-control" name="team_members" id="team-member">
+                            <option value="">select</option>
+                        </select>
+                    </div>
+                    <!-- Hidden field sent in POST request -->
+                    <input type="hidden" name="team_members" id="teamMembersInput">
+                </div>
+
+                <!-- Dynamic Task Status Section -->
+                <div class="form-group">
+                    <label>Custom Task Statuses</label>
+                    <div class="row align-items-end">
+                        <div class="col">
+                            <div class="form-group mb-0">
+                                <label for="newStatusText" class="small text-muted">Status Text</label>
+                                <input type="text" id="newStatusText" class="form-control" placeholder="e.g. In Review">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group mb-0">
+                                <label for="newStatusLevel" class="small text-muted">Level</label>
+                                <select id="newStatusLevel" class="form-control">
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4" selected>4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6" selected>6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="form-group mb-0">
+                                <label class="small text-muted">&nbsp;</label>
+                                <button type="button" class="btn btn-success" onclick="addTaskStatus()">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Display List of Added Statuses -->
+                    <div id="taskStatusList" class="mt-2">
+                        <!-- Added items will appear here as tags -->
+                    </div>
+
+                    <!-- Hidden Input to hold JSON array for POST request -->
+                    <input type="hidden" name="task_statuses" id="taskStatusesInput" value="[]">
+                    <small class="text-muted">These custom statuses will be available for tasks in this project.</small>
+                </div>
+
+            </form>
+        </div>
+
+
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-cancel" onclick="closeProjectModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" id="project-add-edit-btn"
+                onclick="document.getElementById('projectForm').requestSubmit()">Create Project</button>
+        </div>
+
+    </div>
+</div>

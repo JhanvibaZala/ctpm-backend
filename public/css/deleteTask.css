@@ -1,0 +1,171 @@
+.delete-modal{
+
+    width:420px;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+
+
+.delete-icon{
+
+    width:55px;
+
+    height:55px;
+
+    margin:0 auto 15px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+    font-size:24px;
+
+}
+
+
+
+.delete-modal h2{
+
+    margin:0 0 12px;
+
+    font-size:22px;
+
+    color:#1e293b;
+
+}
+
+
+
+.delete-modal p{
+
+    margin:0;
+
+    color:#64748b;
+
+    line-height:1.5;
+
+    font-size:15px;
+
+}
+
+
+
+/* warning message */
+
+.subtask-warning{
+
+    margin:20px 0;
+
+    padding:12px 14px;
+
+    border-radius:10px;
+
+    background:#fff7ed;
+
+    border:1px solid #fed7aa;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+    text-align:left;
+
+    font-size:14px;
+
+    line-height:1.4;
+
+    color:#9a3412;
+
+}
+
+
+
+.subtask-warning i{
+
+    margin-top:2px;
+
+    font-size:15px;
+
+    flex-shrink:0;
+
+}
+
+
+
+.subtask-warning span{
+
+    flex:1;
+
+}
+
+
+
+/* buttons */
+
+.modal-actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    margin-top:25px;
+
+}
+
+
+
+.modal-actions button{
+
+    padding:10px 22px;
+
+    border-radius:8px;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+
+.cancel-btn{
+
+    background:#e2e8f0;
+
+    color:#334155;
+
+}
+
+
+
+.confirm-delete-btn{
+
+    background:#dc2626;
+
+    color:white;
+
+}

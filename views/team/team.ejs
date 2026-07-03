@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team</title>
+    <link rel="stylesheet" href="/css/team.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/project-navbar.css">
+    
+    <!-- shows active link in sidebar -->
+    <style>
+        /* this css for sidebar and different for each page  */
+        .team-active{
+            background-color: #2062d5;
+            color: white !important;
+        }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="project-name">Project Variyari</div>
+    </nav>
+
+    <div class="container">
+      <!-- Sidebar -->
+      <%- include("../common/sidebar.ejs") %>
+      <main class="main-content">
+        <div class="team-container">
+
+            <div class="team-header">
+                <div>
+                    <h1>Workspace Team</h1>
+                    <p>Members and their project assignments</p>
+                </div>
+
+                <div class="member-count">
+                    <%= wsMembers.length + prjMembers.length %> Members
+                </div>
+            </div>
+
+
+            <!-- Workspace Admin Section -->
+            <section class="member-section">
+
+                <h2>
+                    Workspace Admins
+                </h2>
+
+
+                <% wsMembers.forEach(member => { %>
+
+                <div class="member-card" onclick="viewMemberDetails('<%= member.username %>')">
+
+                    <img 
+                    src="<%= member.profile_pic_path || '/images/default.png' %>"
+                    class="avatar"
+                    >
+
+
+                    <div class="member-info">
+
+                        <h3>
+                            <%= member.first_name %>
+                            <%= member.last_name %>
+                        </h3>
+
+                        <span>
+                            @<%= member.username %>
+                        </span>
+
+                        <p>
+                            <%= member.email_id %>
+                        </p>
+
+                    </div>
+
+
+                    <div class="role workspace">
+                        <%= member.role_name %>
+                    </div>
+
+
+                </div>
+
+                <% }) %>
+
+
+            </section>
+
+
+
+            <!-- Projects -->
+
+            <section class="member-section">
+
+
+                <h2>
+                    Project Members
+                </h2>
+
+
+
+                <%
+                const projects = {};
+
+                prjMembers.forEach(member=>{
+
+                    if(!projects[member.project_name]){
+                        projects[member.project_name] = [];
+                    }
+
+                    projects[member.project_name].push(member);
+
+                })
+
+                %>
+
+
+
+                <% Object.keys(projects).forEach(project=>{ %>
+
+
+                <div class="project-card">
+
+
+                    <div class="project-header">
+
+                        <div>
+                            <h3>
+                                <%= project %>
+                            </h3>
+
+                            <span>
+                                <%= projects[project][0].status %>
+                            </span>
+                        </div>
+
+
+                    </div>
+
+
+
+
+                    <% projects[project].forEach(member=>{ %>
+
+
+                    <div class="project-member" onclick="viewMemberDetails('<%= member.username %>')">
+
+
+                        <img 
+                        src="<%= member.profile_pic_path || '/images/default.png' %>"
+                        class="avatar small"
+                        >
+
+
+                        <div class="member-info">
+
+
+                            <h4>
+                                <%= member.first_name %>
+                                <%= member.last_name %>
+                            </h4>
+
+
+                            <span>
+                                @<%= member.username %>
+                            </span>
+
+
+                        </div>
+
+
+
+                        <div class="role 
+                            <%= member.role_name === 'Project Manager'
+                            ? 'manager'
+                            : 'team'
+                            %>">
+
+                            <%= member.role_name %>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <% }) %>
+
+
+
+                </div>
+
+
+
+                <% }) %>
+
+
+            </section>
+
+
+
+        </div>
+
+      </main>
+    </div>
+    <div id="toast"></div>
+    <div id="memberDetailsModal" class="custom-modal">
+
+    <div class="custom-modal-content">
+
+        <div id="memberDetailsModalContent"></div>
+
+    </div>
+
+</div>
+  </body>
+  <script>
+      const workspaceId = "<%= workspace_id %>";
+  </script>
+  <script src="/js/team.js"></script>
+  <script src="/js/toast.js"></script>
+</html>

@@ -1,0 +1,924 @@
+body{
+    background:#f4f6f9;
+}
+
+
+/* Main Header */
+
+.task-detail-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+
+.task-detail-header h2{
+
+    font-size:28px;
+
+}
+
+
+
+/* Buttons */
+
+/* Action Buttons Container */
+
+.action-buttons{
+
+    display:flex;
+
+    gap:18px;
+
+    align-items:center;
+
+}
+
+
+
+/* Common Button Style */
+
+.edit-btn,
+.delete-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+
+    padding:12px 26px;
+
+
+    border:none;
+
+    border-radius:10px;
+
+
+    font-size:15px;
+
+    font-weight:600;
+
+
+    cursor:pointer;
+
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+
+}
+
+
+
+
+/* Edit Button */
+
+.edit-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+
+    box-shadow:
+    0 4px 10px rgba(37,99,235,0.25);
+
+}
+
+
+
+.edit-btn:hover{
+
+    background:#1d4ed8;
+
+
+    transform:translateY(-2px);
+
+
+    box-shadow:
+    0 8px 18px rgba(37,99,235,0.35);
+
+}
+
+
+
+.edit-btn:active{
+
+    transform:scale(0.96);
+
+}
+
+
+
+
+
+/* Delete Button */
+
+.delete-btn{
+
+    background:#ef4444;
+
+    color:white;
+
+
+    box-shadow:
+    0 4px 10px rgba(239,68,68,0.25);
+
+}
+
+
+
+
+.delete-btn:hover{
+
+    background:#dc2626;
+
+
+    transform:translateY(-2px);
+
+
+    box-shadow:
+    0 8px 18px rgba(220,38,38,0.35);
+
+}
+
+
+
+.delete-btn:active{
+
+    transform:scale(0.96);
+
+}
+
+
+
+
+/* Icon Styling */
+
+.edit-btn i,
+.delete-btn i{
+
+    font-size:14px;
+
+}
+
+
+
+
+
+/* Card */
+
+.task-card{
+
+
+    background:white;
+
+    border-radius:10px;
+
+    padding:30px;
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
+
+
+}
+
+
+
+/* Title */
+
+
+.task-title-section{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border-bottom:1px solid #ddd;
+
+    padding-bottom:20px;
+
+}
+
+
+
+.task-title-section h1{
+
+    font-size:26px;
+
+}
+
+
+
+/* Status */
+
+/* .status{
+
+    padding:7px 18px;
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+}
+ */
+
+
+
+
+/* Information Grid */
+
+
+.task-info-grid{
+
+
+    margin-top:30px;
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+
+
+.info-box{
+
+
+    background:#f8fafc;
+
+    padding:18px;
+
+    border-radius:8px;
+
+
+}
+
+
+
+.info-box label{
+
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+
+.info-box p{
+
+
+    margin-top:8px;
+
+    font-size:16px;
+
+    font-weight:600;
+
+
+}
+
+
+
+
+
+/* Description */
+
+
+.description-section,
+.attachment-section{
+
+
+    margin-top:30px;
+
+}
+
+
+
+.description-section h3,
+.attachment-section h3{
+
+
+    margin-bottom:12px;
+
+}
+
+
+
+.description-section p{
+
+
+    background:#f8fafc;
+
+    padding:20px;
+
+    border-radius:8px;
+
+    line-height:1.6;
+
+}
+
+
+
+
+
+
+/* Responsive */
+
+
+@media(max-width:900px){
+
+
+.task-info-grid{
+
+grid-template-columns:1fr;
+
+}
+
+
+}
+
+
+/* Status and Priority section */
+
+.task-meta{
+
+    display:flex;
+
+    gap:40px;
+
+    align-items:center;
+
+    margin-top:25px;
+
+}
+
+
+
+.status-container,
+.priority-container{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+
+
+.status-container label,
+.priority-container label{
+
+    font-size:14px;
+
+    color:#64748b;
+
+    font-weight:500;
+
+}
+
+
+
+
+/* Status badge */
+
+.status-badge{
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+
+/* Priority badge common */
+
+.priority-badge{
+
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    display:inline-block;
+
+}
+
+
+
+
+/* Priority levels */
+
+
+.priority-badge.low{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+}
+
+
+
+.priority-badge.medium{
+
+    background:#fef9c3;
+
+    color:#a16207;
+
+}
+
+
+
+.priority-badge.high{
+
+    background:#fed7aa;
+
+    color:#c2410c;
+
+}
+
+
+
+.priority-badge.urgent{
+
+    background:#fee2e2;
+
+    color:#b91c1c;
+
+}
+
+.attachment-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+
+    gap:20px;
+
+    margin-top:20px;
+
+}
+
+
+
+.attachment-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    background:white;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    transition:0.2s;
+
+}
+
+
+
+.attachment-card:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+
+}
+
+
+
+.attachment-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+}
+
+
+
+.image-file{
+
+    background:#dbeafe;
+
+    color:#2563eb;
+
+}
+
+
+
+.pdf-file{
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+}
+
+
+
+.excel-file{
+
+    background:#dcfce7;
+
+    color:#16a34a;
+
+}
+
+
+
+.doc-file{
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+}
+
+
+
+.other-file{
+
+    background:#f3f4f6;
+
+    color:#4b5563;
+
+}
+
+
+
+.attachment-info{
+
+    flex:1;
+
+}
+
+
+
+.attachment-info h4{
+
+    margin:0 0 8px;
+
+    font-size:14px;
+
+    word-break:break-word;
+
+}
+
+
+
+.attachment-link{
+
+    text-decoration:none;
+
+    color:#2563eb;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+
+.attachment-link:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* delete task modal css */
+
+/* Modal Background */
+
+.delete-modal-overlay{
+
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:100%;
+
+
+    background:rgba(0,0,0,0.45);
+
+
+    display:none;
+
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    z-index:1000;
+
+}
+
+
+
+
+/* Modal Box */
+
+
+.delete-modal{
+
+
+    background:white;
+
+
+    width:420px;
+
+
+    padding:30px;
+
+
+    border-radius:14px;
+
+
+    text-align:center;
+
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,0.2);
+
+
+    animation:popup 0.25s ease;
+
+}
+
+
+
+@keyframes popup{
+
+
+    from{
+
+        transform:scale(0.8);
+
+        opacity:0;
+
+    }
+
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+
+}
+
+
+
+
+/* Warning Icon */
+
+
+.delete-icon{
+
+
+    width:65px;
+
+    height:65px;
+
+
+    margin:auto;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    background:#fee2e2;
+
+
+    color:#dc2626;
+
+
+    font-size:28px;
+
+
+}
+
+
+
+
+.delete-modal h2{
+
+
+    margin-top:20px;
+
+    font-size:24px;
+
+
+}
+
+
+
+
+.delete-modal p{
+
+
+    color:#64748b;
+
+    line-height:1.5;
+
+    margin:15px 0 25px;
+
+
+}
+
+
+
+
+
+/* Buttons */
+
+
+.modal-actions{
+
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+
+}
+
+
+
+.cancel-btn,
+.confirm-delete-btn{
+
+
+    padding:11px 22px;
+
+
+    border:none;
+
+
+    border-radius:8px;
+
+
+    cursor:pointer;
+
+
+    font-size:15px;
+
+
+    font-weight:600;
+
+
+}
+
+
+
+
+
+.cancel-btn{
+
+
+    background:#e5e7eb;
+
+
+    color:#374151;
+
+
+}
+
+
+
+.cancel-btn:hover{
+
+
+    background:#d1d5db;
+
+}
+
+
+
+
+.confirm-delete-btn{
+
+
+    background:#dc2626;
+
+
+    color:white;
+
+
+}
+
+
+
+.confirm-delete-btn:hover{
+
+
+    background:#b91c1c;
+
+
+}
+
+
+#toast{
+
+    position:fixed;
+
+    top:20px;
+
+    right:20px;
+
+    padding:15px 25px;
+
+    border-radius:8px;
+
+    color:white;
+
+    font-size:15px;
+
+    display:none;
+
+    z-index:9999;
+
+}
+
+
+#toast.success{
+
+    background:#16a34a;
+
+}
+
+
+#toast.error{
+
+    background:#dc2626;
+
+}

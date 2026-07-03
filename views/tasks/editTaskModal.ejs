@@ -1,0 +1,234 @@
+<div id="editTaskModal" class="modal-overlay">
+
+    <div class="modal-content">
+
+        <div class="add-task-modal-header">
+
+            <div>
+                <h2>Edit Task</h2>
+                <p class="modal-subtitle">
+                    Update task details
+                </p>
+            </div>
+
+
+            <button 
+                class="close-btn"
+                onclick="closeEditTaskModal()">
+                &times;
+            </button>
+
+        </div>
+        <div class="modal-body">
+            <form 
+                id="editTaskForm"
+                enctype="multipart/form-data"
+            >
+
+                <input 
+                    type="hidden"
+                    id="editTaskId"
+                    value="<%= task.id %>"
+                >
+                <div class="add-task-form">
+                    <!-- Task Name -->
+                    <div class="full-field">
+                        <label class="label-field">
+                            Task Name
+                        </label>
+                        <input 
+                            type="text"
+                            id="editTaskName"
+                            class="large-field-bar"
+                            name="taskName"
+                        >
+                    </div>
+
+                    <div class="task-grid">
+
+                        <!-- Assignees -->
+                        <div class="inline-column">
+                            <label class="label-field">
+                                Assignees
+                            </label>
+                            <div class="assignee-box">
+                                <div 
+                                    id="editSelectedAssignees"
+                                    class="selected-assignees">
+                                </div>
+                                <input 
+                                    type="text"
+                                    id="editAssigneeSearch"
+                                    placeholder="Search members..."
+                                >
+                                <div 
+                                    id="editAssigneeDropdown"
+                                    class="assignee-dropdown">
+                                </div>
+                            </div>
+                            <input 
+                                type="hidden"
+                                name="assignees"
+                                id="editAssigneesInput"
+                            >
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="inline-column">
+                            <label class="label-field">
+                                Start Date
+                            </label>
+                            <div 
+                                class="date-container"
+                                onclick="openEditStartDatePicker()"
+                            >
+                                <i class="fa-regular fa-calendar"></i>
+                                <span id="editStartDateText">
+                                    Select date
+                                </span>
+                                <input 
+                                    type="date"
+                                    id="editStartDate"
+                                    name="startDate"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="inline-column">
+                            <label class="label-field">
+                                Due Date
+                            </label>
+                            <div 
+                                class="date-container"
+                                onclick="openEditDueDatePicker()"
+                            >
+
+                                <i class="fa-regular fa-calendar"></i>
+                                <span id="editDueDateText">
+                                    Select date
+                                </span>
+                                <input 
+                                    type="date"
+                                    id="editDueDate"
+                                    name="dueDate"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="inline-column">
+
+                            <label class="label-field">
+                                Priority
+                            </label>
+                            <select 
+                                id="editPriority"
+                                class="priority-select"
+                                name="priorityLevel"
+                            >
+                                <option value="Low">
+                                    Low
+                                </option>
+                                <option value="Medium">
+                                    Medium
+                                </option>
+                                <option value="High">
+                                    High
+                                </option>
+                                <option value="Urgent">
+                                    Urgent
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="inline-column">
+                            <label class="label-field">
+                                Status
+                            </label>
+                            <select 
+                                id="editStatus"
+                                class="priority-select"
+                                name="statusLevel"
+                            >
+                            </select>
+                        </div>
+
+                        <!-- Estimated Hours -->
+                        <div class="inline-column">
+                            <label class="label-field">
+                                Estimated Hours
+                            </label>
+                            <input 
+                                type="text"
+                                id="editEstimatedHours"
+                                class="small-input-field"
+                                name="estimatedHours"
+                            >
+                        </div>
+
+                        <!-- Completed -->
+                        <div class="checkbox-column">
+                            <input 
+                                type="checkbox"
+                                id="editCompleted"
+                                name="isCompleted"
+                            >
+                            <label for="editCompleted">
+                                Mark Complete
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="description-box">
+                        <textarea 
+                            id="editTaskDescription"
+                            placeholder="Add description..."
+                            name="startDate"
+                        ></textarea>
+                    </div>
+
+                    <!-- Attachments -->
+                    <div class="upload-section">
+                        <label class="upload-title">
+                            Attachments
+                        </label>
+                        <input 
+                            type="hidden"
+                            id="deletedFiles"
+                            name="deletedFiles"
+                            />
+                        <div class="upload-box">
+                            <input 
+                                type="file"
+                                id="editAttachments"
+                                name="attachments"
+                                multiple
+                                hidden
+                            >
+                            <label 
+                                for="editAttachments"
+                                class="upload-btn"
+                            >
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </label>
+                            <div id="editFileList"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="submit"
+                            id="update-task-button"
+                        >
+                            Update Task
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</div>

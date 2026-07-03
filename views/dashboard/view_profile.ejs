@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile - Alpha Dashboard</title>
+    <!-- <link rel="stylesheet" href="/css/edit_profile.css"> -->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/view_profile.css">
+    <style>
+        /* don't move this code to separate css file */
+        /* sidebar activate  */
+        .profile-active {
+            background-color: #2062d5;
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+
+    <main class="main-content">
+        <%- include('../common/sidebar') %>
+
+            <div class="content-area">
+                <!-- error show if occurs -->
+                <% if(typeof error !=undefined && error) {%>
+                    <div class="error-container" id="errorFlash">
+                        <p class="error-msg">
+                            <%= error %>
+                        </p>
+                        <button class="close-btn" id="closeErrorBtn">&times;</button>
+                    </div>
+                    <% } %>
+
+
+                        <div class="profile-container">
+
+                            <div class="profile-header">
+                                <!-- Dynamic Image Source -->
+                                <% if(user.profile_pic_path !=null) {%>
+                                    <img src='<%= user.profile_pic_path %>' alt="Profile" class="profile-pic-large">
+                                    <%}else {%>
+                                        <img src="/images/user_profile/default_user.webp" alt="Profile"
+                                            class="profile-pic-large">
+                                        <% } %>
+                                            <h2>
+                                                <%= user.first_name %>
+                                                    <%= user.last_name %>
+                                            </h2>
+                                            <p style="color: #6b7280;">@<%= user.username %>
+                                            </p>
+                            </div>
+
+                            <!-- Read-Only Data Grid -->
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>First Name</label>
+                                    <p>
+                                        <%= user.first_name %>
+                                    </p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Last Name</label>
+                                    <p>
+                                        <%= user.last_name %>
+                                    </p>
+                                </div>
+                                <div class="info-item full-width">
+                                    <label>Email Address</label>
+                                    <p>
+                                        <%= user.email_id %>
+                                    </p>
+                                </div>
+                                <div class="info-item full-width">
+                                    <label>Bio</label>
+                                    <p class="bio-text">
+                                        <%= user.bio %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <a href="/dashboard/profile/edit" class="btn-edit">Edit Profile</a>
+                            </div>
+
+                        </div>
+            </div>
+    </main>
+    <script src="/js/errorFlash.view_profile.js"></script>
+</body>
+
+</html>

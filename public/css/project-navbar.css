@@ -1,0 +1,117 @@
+/* Project Navigation Bar Styles */
+.project-navbar-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px 20px 0 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.project-navbar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.project-navbar-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.project-navbar-title h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #111827; /* Dark text for readability */
+  font-weight: 700;
+}
+
+/* Tab Navigation Styling */
+.project-navbar-tabs {
+  display: flex;
+  gap: 30px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.nav-tab {
+  text-decoration: none;
+  color: #6b7280;
+  padding: 10px 5px;
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -2px; /* Pulls the border down to overlap the container border */
+}
+
+.nav-tab:hover {
+  color: #2563eb; /* Matches your theme's blue */
+}
+
+/* Active State for the current view */
+.nav-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+.kb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.kb-badge--deadline {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+/* Project Status Badge Styling */
+.nav-status-badge {
+  padding: 4px 12px;
+  border-radius: 9999px; /* Makes it a pill shape */
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid transparent;
+}
+
+/* Dynamic colors based on the status text */
+.nav-status-badge.active,
+.nav-status-badge.in-progress {
+  background-color: #dbeafe; /* Light blue */
+  color: #1e40af; /* Dark blue */
+  border-color: #bfdbfe;
+}
+
+.nav-status-badge.completed,
+.nav-status-badge.done {
+  background-color: #d1fae5; /* Light green */
+  color: #065f46; /* Dark green */
+  border-color: #a7f3d0;
+}
+
+.nav-status-badge.on-hold,
+.nav-status-badge.paused {
+  background-color: #fef3c7; /* Light amber/yellow */
+  color: #92400e; /* Dark amber */
+  border-color: #fde68a;
+}
+
+.nav-status-badge.cancelled,
+.nav-status-badge.archived {
+  background-color: #f3f4f6; /* Light gray */
+  color: #374151; /* Dark gray */
+  border-color: #e5e7eb;
+}

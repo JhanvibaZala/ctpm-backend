@@ -1,0 +1,145 @@
+:root {
+    --sidebar-width: 260px;
+    --primary-color: #2062d5;
+    --bg-color: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+body {height: 100vh; background-color: var(--bg-color); }
+
+/* Navbar Styling */
+.navbar {
+    background-color: #2062d5;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.project-name {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+/* Main Content Styles */
+.container{
+    display: flex;
+}
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.btn-add {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-join {
+    background-color: #cacaca;
+    color: #2c3e50;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-join:hover{
+    background-color: #bdc3c7;
+}
+
+/* Project Cards Grid */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.project-card {
+    cursor: pointer;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.project-card:hover { transform: translateY(-5px); }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Pending */
+.status-Pending {background: #fef3c7;color: #92400e;}
+
+/* WIP (Work In Progress) */
+.status-WIP {background: #dbeafe;color: #1e40af;}
+
+/* On Hold */
+.status-On {background: #fee2e2;color: #991b1b;}
+
+/* Completed */
+.status-Completed {background: #d1fae5;color: #065f46;}
+
+.card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 8px; color: var(--text-dark); }
+.card-desc { font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px; line-height: 1.4; }
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 15px;
+}
+
+.team-avatars { display: flex; }
+.team-avatars img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-left: -10px;
+}
+.team-avatars img:first-child { margin-left: 0; }
+
+.progress-text { font-size: 0.85rem; font-weight: bold; color: var(--text-dark); }   
+
+

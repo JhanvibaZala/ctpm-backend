@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspaces list</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/modal_overlay.css">
+    <link rel="stylesheet" href="/css/workspace_list.css">
+
+    <style>
+        /* sidebar activate  */
+        
+        .dash-active {
+            background-color: #2062d5;
+            color: white !important;
+        }
+
+       
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+    <div class="container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <img src="/images/user_profile/default_user.webp" id="sidebar-user-profile" alt="Profile"
+                    class="profile-photo">
+                <div class="profile-name" id="sidebar-user-fullname">Alex Morgan</div>
+                <div class="profile-role" id="sidebar-username">Project Manager</div>
+            </div>
+            <nav class="nav-links">
+                <a href="/dashboard/workspaces" class="dash-active"><i class="fa-solid fa-building"></i> Workspace
+                    List</a>
+                <!-- <a href="#" class="mypr-active">My Projects</a> -->
+                <!-- <a href="#" class="task-active">Tasks</a> -->
+                <!-- <a href="#" class="team-active">Team</a> -->
+                <!-- <a href="/dashboard/profile" class="profile-active">Profile</a> -->
+
+
+                <a href="/auth/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
+            </nav>
+
+        </aside>
+
+        <!-- create workspace popup form template  -->
+        <%- include('./create_workspace_form') %>
+            <%- include('./join_workspace') %>
+
+
+                <!-- Main Screen -->
+                <main class="main-content">
+                    <header class="header">
+                        <h2>Workspace List</h2>
+                        <div class="btns">
+                            <button class="btn-join" id="joinWorkspace" onclick="openJoinWorkspaceModal()">Join
+                                Workspace</button>
+                            <button class="btn-add" id="addProjectBtn" onclick="openModal()">+ New Workspace</button>
+                        </div>
+                    </header>
+
+                    <div class="projects-grid" id="projectsGrid">
+                        <!-- workspace Card 1 -->
+                        <% for(let i=0;i<workspaces.length; i++) { %>
+                            <div class="project-card"
+                                onclick="openWorkspaceDashboard('<%= workspaces[i].workspace_id %>')">
+                                <!-- <div class="project-card" onclick="openWorkspaceProjects('<%= workspaces[i].workspace_id %>')"> -->
+                                <div class="card-header">
+
+                                </div>
+                                <div class="card-title">
+                                    <%= workspaces[i].workspace_name %>
+                                </div>
+                                <div class="card-desc">
+                                    <%= workspaces[i].description %>
+                                </div>
+                                <!-- <div class="card-footer">
+                                    <div class="team-avatars">
+                                        <img src="https://i.pravatar.cc/150?img=32" alt="User">
+                                        <img src="https://i.pravatar.cc/150?img=11" alt="User">
+                                    </div>
+                                </div> -->
+                                <div class="card-btn">
+                                    <button id="workspace-delete-btn" class="workspace-btn workspace-delete-btn"
+                                        data-workspace-id="<%= workspaces[i].workspace_id %>"><i class="fa-solid fa-trash"></i>
+                                        Delete</button>
+
+                                </div>
+                            </div>
+                            <% } %>
+
+                                <!-- workspace Card 2 -->
+                                <!-- <div class="project-card" onclick="openWorkspaceProjects(2)">
+                            <div class="card-header">
+                                <span class="status-badge status-pending">Planning</span>
+                                <span>📅 Due: Jul 10</span>
+                            </div>
+                            <div class="card-title">Mobile App Launch</div>
+                            <div class="card-desc">Coordinate the Q3 launch strategy for iOS and Android.</div>
+                            <div class="card-footer">
+                                <div class="team-avatars">
+                                    <img src="https://i.pravatar.cc/150?img=60" alt="User">
+                                </div>
+                                <span class="progress-text">15% Done</span>
+                            </div>
+                        </div> -->
+                    </div>
+                </main>
+    </div>
+    </nav>
+
+    <!-- <main>
+        <div class="welcome">
+            <h1>Welcome back 👋</h1>
+
+            <table>
+                <tr>
+                    <td>User ID</td>
+                    <td><code><%= user.id %></code></td>
+                </tr>
+                <tr>
+                    <td>Username</td>
+                    <td>
+                        <%= user.username %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>
+                        <%= user.email_id || user.email %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td>
+                        <%= user.first_name %>
+                            <%= user.last_name || '' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Auth method</td>
+                    <td>
+                        <%= user.sso_provider || 'password' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        <%= user.account_status || 'Active' %>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </main> -->
+
+    <script src="/js/fetchUser.dashboard.js"></script>
+    <script src="/js/loadWorkspaces.dashboard.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/all.min.js"
+        integrity="sha512-6BTOlkauINO65nLhXhthZMtepgJSghyimIalb+crKRPhvhmsCdnIuGcVbR5/aQY2A+260iC1OPy1oCdB6pSSwQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/workspace_functionality.js"></script>
+</body>
+
+</html>

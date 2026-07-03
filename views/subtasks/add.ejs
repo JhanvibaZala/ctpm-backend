@@ -1,0 +1,160 @@
+<div class="subtask-modal" id="subtaskModal">
+  <div class="subtask-modal-box">
+    <div class="modal-header">
+      <h2>Create Subtask</h2>
+
+      <button onclick="closeSubtaskModal()">×</button>
+    </div>
+
+    <form id="addSubtaskForm" method="POST" enctype="multipart/form-data">
+      <label> Task Name </label>
+
+      <input type="text" name="taskName" id="taskName" placeholder="Write a task name" />
+
+      <div class="two-column">
+        <div>
+          <div class="inline-column">
+            <label class="label-field">
+                Assignees
+            </label>
+            <div class="assignee-box">
+                <div 
+                    id="selectedAssignees"
+                    class="selected-assignees">
+                </div>
+                <input 
+                    type="text"
+                    id="assigneeSearch"
+                    placeholder="Search members..."
+                >
+                <div 
+                    id="assigneeDropdown"
+                    class="assignee-dropdown">
+                </div>
+            </div>
+            <input 
+                type="hidden"
+                name="assignees"
+                id="assigneesInput"
+            >
+          </div>
+
+        </div>
+
+        <div>
+          <label> Start Date </label>
+
+          <div 
+              class="date-container"
+              onclick="openStartDatePicker()"
+          >
+              <i class="fa-regular fa-calendar"></i>
+              <span id="startDateText">
+                  Select date
+              </span>
+              <input 
+                  type="date"
+                  id="startDate"
+                  name="startDate"
+              >
+          </div>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div>
+          <label> Due Date </label>
+
+          <div 
+              class="date-container"
+              onclick="openDueDatePicker()"
+          >
+              <i class="fa-regular fa-calendar"></i>
+              <span id="dueDateText">
+                  Select date
+              </span>
+              <input 
+                  type="date"
+                  id="dueDate"
+                  name="dueDate"
+              >
+          </div>
+        </div>
+
+        <div>
+          <label> Priority Level </label>
+
+          <select name="priorityLevel" id="priorityLevel">
+            <option value="Low">Low</option>
+
+            <option value="Medium" selected>Medium</option>
+
+            <option value="High">High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div>
+          <label> Status </label>
+
+          <select name="statuses" id="statuses">
+            
+          </select>
+        </div>
+
+        <div>
+          <label> Estimated Hours </label>
+
+          <input type="text" id="estimatedHours" name="estimatedHours" />
+        </div>
+      </div>
+
+      <label class="checkbox">
+        <input type="checkbox" name="isCompleted" id="isCompleted" />
+
+        Mark Complete
+      </label>
+
+      <textarea name="description" id="description" placeholder="Add description..."></textarea>
+
+
+        <div class="subtask-upload-section">
+
+          <label class="subtask-upload-title">
+              Attachments
+          </label>
+
+
+          <div class="subtask-upload-box">
+
+              <input 
+                  type="file"
+                  id="subtaskAttachments"
+                  name="attachments"
+                  multiple
+                  hidden
+              >
+
+
+              <label 
+                  for="subtaskAttachments"
+                  class="subtask-upload-btn"
+              >
+                  <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
+              </label>
+
+
+              <div id="subtaskFileList" class="subtask-file-list">
+
+              </div>
+
+
+          </div>
+
+      </div>
+
+      <button class="create-btn">Create Subtask</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="profile-section">
+        <img src="/images/user_profile/default_user.webp" id="sidebar-user-profile" alt="Profile" class="profile-photo">
+        <div class="profile-name" id="sidebar-user-fullname">Alex Morgan</div>
+        <div class="profile-role" id="sidebar-username">Project Manager</div>
+    </div>
+    <nav class="nav-links">
+        <a href="/api/workspaces/<%=workspace_id%>/dashboard" id="dashboard-link" class="dash-active"><i class="fa-solid fa-house"></i> Dashboard</a>
+        <a href="/dashboard/workspaces" class=""><i class="fa-solid fa-building"></i> Workspaces</a>
+        <a href="/dashboard/workspaces" id="project-link" class="project-active"><i class="fa-solid fa-diagram-project"></i> My Projects</a>
+        <a href="/dashboard" id="task-link" class="task-active"><i class="fa-solid fa-list-check"></i> Tasks</a>
+        <a href="/api/workspaces/<%=workspace_id%>/team" class="team-active"><i class="fa-solid fa-people-group"></i> Team</a>
+        <a href="/dashboard/profile" class="profile-active"><i class="fa-solid fa-circle-user"></i> Profile</a>
+        <a href="/auth/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</a>
+    </nav>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/js/all.min.js"
+    integrity="sha512-6BTOlkauINO65nLhXhthZMtepgJSghyimIalb+crKRPhvhmsCdnIuGcVbR5/aQY2A+260iC1OPy1oCdB6pSSwQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+
+    // if localstorage has is of current workspace then click on project then shows current workspace project else you have to select workspace again
+    if (localStorage.getItem("current_workspace")) {
+        document.getElementById("project-link").setAttribute("href", "/api/workspaces/" + localStorage.getItem("current_workspace")+ "/projects") 
+        document.getElementById("dashboard-link").setAttribute("href", "/api/workspaces/" + localStorage.getItem("current_workspace")+ "/dashboard") 
+
+    } else {
+        window.location.href = "/dashboard/workspaces"
+    }
+
+    //get current workspace and project from localstorage if it is set else redirect to project instead of tasks 
+    // and when you select project localstorage will set both id's 
+    const task_link = document.getElementById("task-link")
+    if (localStorage.getItem("task_link")) {
+        task_link.setAttribute("href", localStorage.getItem("task_link"))
+    }
+
+    //fetch and assign data to sidebar
+    async function fetchUser() {
+        try {
+            const response = await fetch("/dashboard/getuser")
+            console.log(response)
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data.user)
+                return data.user
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async function setUserData() {
+        const user = await fetchUser()
+        document.querySelector("#sidebar-user-fullname").innerHTML = `${user.first_name} ${user.last_name}`
+        document.querySelector("#sidebar-username").innerHTML = `@${user.username}`
+        if (user.profile_pic_path != null) {
+            document.querySelector("#sidebar-user-profile").setAttribute("src", user.profile_pic_path);
+        }
+    }
+
+    setUserData()
+</script>

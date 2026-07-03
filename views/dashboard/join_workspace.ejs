@@ -1,0 +1,61 @@
+
+
+    <!-- Modal Structure -->
+    <div id="joinWorkspaceModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-icon" onclick="closeJoinWorkspaceModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2>Create New Workspace</h2>
+            </div>
+
+            <form id="createWorkspaceForm" action="/api/workspaces/joinWorkspace" method="post" >
+                <!-- Workspace Name -->
+                <div class="form-group">
+                    <label for="invite-code">Invitation Code</label>
+                    <input type="text" id="invite-code" name="invite_code" placeholder="Enter code (e.g., XYZ-123)">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Join Workspace</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const joinModal = document.getElementById('joinWorkspaceModal');
+
+        // Function to open the modal
+        function openJoinWorkspaceModal() {
+            joinModal.style.display = 'flex';
+        }
+
+        // Function to close the modal
+        function closeJoinWorkspaceModal() {
+            joinModal.style.display = 'none';
+        }
+
+        // Close modal if user clicks outside the content box
+        window.onclick = function(event) {
+            if (event.target === joinModal) {
+                closeJoinWorkspaceModal();
+            }
+        }
+
+        // Handle Form Submission
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent page reload
+            
+            const name = document.getElementById('wsName').value;
+            const desc = document.getElementById('wsDesc').value;
+
+            // Here you would typically send data to your backend
+            console.log('Workspace Created:', { name, desc });
+            alert(`Workspace "${name}" created successfully!`);
+            
+            // Reset form and close
+            document.getElementById('createWorkspaceForm').reset();
+            closeModal();
+        }
+    </script>

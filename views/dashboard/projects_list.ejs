@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects list</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/project_list.css">
+    <style>
+        /* don't move this code to separate css file */
+        /* sidebar activate  */
+        .project-active {
+            background-color: #2062d5;
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+
+    <!-- create project popup template file -->
+     <%- include('./create_project_form') %>
+
+    <div class="container">
+
+        <!-- sidebar tempalte  -->
+        <%- include('../common/sidebar') %>
+        
+    <!-- Main Screen -->
+    <main class="main-content">
+        <header class="header">
+            <h2>Project Overview</h2>
+            <button class="btn-add" id="addProjectBtn" onclick="openProjectModal('create')">+ New Project</button>
+        </header>
+
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Project Card 1 -->
+            <% for(let i=0;i<projects.length;i++) { %>
+                <div class="project-card" id="<%= projects[i].id %>" onclick="handleProjectCardClick('<%=projects[i].workspace_id%>','<%= projects[i].id %>')">
+                <div class="card-header">
+                    <span class="status-badge status-<%= projects[i].status %>"><%= projects[i].status %></span>
+                    <span>📅 Due: <%= projects[i].format_deadline %></span>
+                </div>
+                <div class="card-title"><%= projects[i].project_name %></div>
+                <div class="card-desc"><%= projects[i].description %></div>
+                <!-- <div class="card-footer">
+                    <div class="team-avatars">
+                        <img src="https://i.pravatar.cc/150?img=32" alt="User">
+                        <img src="https://i.pravatar.cc/150?img=11" alt="User">
+                    </div>
+                    <span class="progress-text">75% Done</span>
+                </div> -->
+                <div class="card-btn">
+                    <button id="project-delete-btn" class="project-btn project-delete-btn" data-project-id="<%= projects[i].id %>"><i class="fa-solid fa-trash"></i> Delete</button>
+                    <button id="project-edit-btn" class="project-btn project-edit-btn" data-project-id="<%= projects[i].id %>"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- Project Card 2 -->
+            <!-- <div class="project-card">
+                <div class="card-header">
+                    <span class="status-badge status-pending">Planning</span>
+                    <span>📅 Due: Jul 10</span>
+                </div>
+                <div class="card-title">Mobile App Launch</div>
+                <div class="card-desc">Coordinate the Q3 launch strategy for iOS and Android.</div>
+                <div class="card-footer">
+                    <div class="team-avatars">
+                        <img src="https://i.pravatar.cc/150?img=60" alt="User">
+                    </div>
+                    <span class="progress-text">15% Done</span>
+                </div>
+            </div> -->
+        </div>
+    </main>
+    </div>
+
+
+    <script src="/js/project_create_form.js"></script>
+    <script src="/js/project_functionality.js"></script>
+
+</body>
+
+</html>

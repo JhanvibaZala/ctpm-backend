@@ -1,0 +1,68 @@
+
+
+    <!-- Modal Structure -->
+    <div id="workspaceModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-icon" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2>Create New Workspace</h2>
+            </div>
+
+            <form id="createWorkspaceForm" action="/api/workspaces/createWorkspace" method="post" >
+                <!-- onsubmit="handleFormSubmit(event)" -->
+                <!-- Workspace Name -->
+                <div class="form-group">
+                    <label for="wsName">Workspace Name</label>
+                    <input type="text" id="wsName" name="workspace_name" placeholder="e.g., Marketing Team" required>
+                </div>
+
+                <!-- Workspace Description -->
+                <div class="form-group">
+                    <label for="wsDesc">Description</label>
+                    <textarea id="wsDesc" name="description" placeholder="Briefly describe the workspace purpose..." required></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Create Workspace</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const modal = document.getElementById('workspaceModal');
+
+        // Function to open the modal
+        function openModal() {
+            modal.style.display = 'flex';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal if user clicks outside the content box
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Handle Form Submission
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent page reload
+            
+            const name = document.getElementById('wsName').value;
+            const desc = document.getElementById('wsDesc').value;
+
+            // Here you would typically send data to your backend
+            console.log('Workspace Created:', { name, desc });
+            alert(`Workspace "${name}" created successfully!`);
+            
+            // Reset form and close
+            document.getElementById('createWorkspaceForm').reset();
+            closeModal();
+        }
+    </script>

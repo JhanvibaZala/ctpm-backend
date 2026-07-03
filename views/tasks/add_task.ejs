@@ -1,0 +1,257 @@
+<!-- function -->
+<% function getError(field) {
+    if(!errors) return null;
+    const error = errors.find(err => err.field === field);
+
+    return error ? error.message : null;
+} %>
+
+
+<div id="taskModal" class="modal-overlay">
+
+    <div class="modal-content">
+        <div class="add-task-modal-header">
+
+            <div>
+                <h2>Create Task</h2>
+                <p class="modal-subtitle">
+                    Add a new task to this project
+                </p>
+            </div>
+
+
+            <button 
+                class="close-btn"
+                onclick="closeTaskModal()">
+                &times;
+            </button>
+
+        </div>
+
+        <input hidden type="text" id="workspaceId" value="<%= workspace_id %>">
+        <input hidden type="text" id="projectId" value="<%= project_id %>">
+
+        <div class="modal-body">
+
+            <form action="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/tasks" method="POST" enctype="multipart/form-data">
+                
+                <div class="add-task-form">         
+                    <div class="form-section">           
+                        <div class="full-field">
+
+                            <label class="label-field">
+                                Task Name
+                            </label>
+
+
+                            <input 
+                                type="text"
+                                name="taskName"
+                                placeholder="Write a task name"
+                                class="large-field-bar"
+                                value="<%= locals.form ? form.taskName : "" %>"
+                            >
+
+                        </div>
+                    
+                        <% if(getError("taskName")) { %>
+                            <span class="error-message">
+                                <%= getError("taskName") %>
+                            </span>
+                        <% } %>
+                        <div class="task-grid">
+                            
+                            <div class="inline-column">
+                                <div class="inline-column">
+                                    <input 
+                                    type="hidden"
+                                    name="assignees"
+                                    id="assigneesInput"
+                                />
+                                    <label class="label-field">
+                                        Assignees
+                                    </label>
+
+
+                                    <div class="assignee-box">
+
+
+                                        <div id="selectedAssignees" class="selected-assignees">
+                                            
+                                        </div>
+
+
+                                        <input 
+                                            type="text"
+                                            id="assigneeSearch"
+                                            placeholder="Search members..."
+                                            autocomplete="off"
+                                        >
+
+
+                                        <div id="assigneeDropdown" class="assignee-dropdown">
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="inline-column">
+                                <label class="label-field" for="startDate">Start date</label>
+                               <div class="date-container" onclick="openStartDatePicker()">
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <span id="startDateText">
+                                        <%= form?.startDate ? form.startDate : "No start date" %>
+                                    </span>
+
+                                    <input 
+                                        type="date" 
+                                        id="startDate"
+                                        name="startDate"
+                                        value="<%= form?.startDate ? form.startDate : "" %>"
+                                    >
+
+                                </div>
+                                
+                                <% if(getError("startDate")) { %>
+                                    <span class="error-message">
+                                        <%= getError("startDate") %>
+                                    </span>
+                                <% } %>
+                            </div>
+
+                            <div class="inline-column">
+
+                                <label class="label-field" for="dueDate">Due date</label>
+                                <div class="date-container" onclick="openDueDatePicker()">
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    <span id="dateText">
+                                        <%= form?.dueDate ? form.dueDate : "No due date" %>
+                                    </span>
+
+                                    <input 
+                                        type="date" 
+                                        id="dueDate"
+                                        name="dueDate"
+                                        value="<%= form?.dueDate ? form.dueDate : "" %>"
+                                    >
+
+                                </div>
+
+                                <% if(getError("dueDate")) { %>
+                                    <span class="error-message">
+                                        <%= getError("dueDate") %>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <div class="inline-column">
+                                <label class="label-field" for="priorityLevel" >Priority Level</label>
+                                <select name="priorityLevel" id="priorityLevel" class="priority-select">
+                                    <option value="Low" class="low" <%= form?.priorityLevel === "Low" ? "selected" : "" %> >Low</option>
+                                    <option value="Medium" class="medium" <%= form?.priorityLevel === "Medium" ? "selected" : "" %> >Medium</option>
+                                    <option value="High" class="high" <%= form?.priorityLevel === "High" ? "selected" : "" %>>High</option>
+                                    <option value="Urgent" class="urgent" <%= form?.priorityLevel === "Urgent" ? "selected" : "" %>>Urgent</option>
+                                </select>
+                            </div>
+                            <div class="inline-column">
+                                <input type="text" value="<%= locals.form ? form.statuses : "" %>" name="oldStatus" id="oldStatus" hidden>
+                                <label class="label-field" for="statuses" >Status </label>
+                                <div id="statusDiv"></div>
+                                <select name="statuses" id="statuses" class="priority-select">
+                                    
+                                </select>
+
+                            </div>
+                            <div class="inline-column">
+                                <label class="label-field" for="estimatedHours" >Estimated Hrs</label>
+                                <input type="text" class="small-input-field" name="estimatedHours" id="estimatedHours" value="<%= locals.form ? form.estimatedHours : "" %>">
+
+                                <% if(getError("estimatedHours")) { %>
+                                    <span class="error-message">
+                                        <%= getError("estimatedHours") %>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <div class="checkbox-column">
+
+                                <input 
+                                    type="checkbox"
+                                    name="isCompleted"
+                                    id="isCompleted"
+                                >
+
+                                <label for="isCompleted">
+                                    Mark Complete
+                                </label>
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="description-box">
+                        <textarea name="description" id="decription" placeholder="Add description..." ><%= locals.form ? form.description : "" %></textarea>
+
+                        <% if(getError("description")) { %>
+                            <span class="error-message">
+                                <%= getError("description") %>
+                            </span>
+                        <% } %>
+                    </div>
+                    <div class="upload-section">
+                        <label class="upload-title">
+                            Attachments
+                        </label>
+                        <div class="upload-box">
+                            <input 
+                            type="file"
+                            id="attachments"
+                            name="attachments"
+                            hidden
+                            multiple
+                            accept=".pdf,.xlsx,.xls,.csv,image/*"
+                            >
+                            <label 
+                            for="attachments"
+                            class="upload-btn">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            
+                        </label>
+                        <div id="fileList"></div>
+                        <% if(getError("attachments")) { %>
+                            <span class="error-message">
+                                <%= getError("attachments") %>
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+                    <div class="modal-footer">
+
+
+                        <button 
+                            type="submit"
+                            id="create-task-button">
+
+                            Create Task
+
+                        </button>
+
+
+                    </div>
+                </div>
+
+                
+        </form>
+    </div>
+        
+    </div>
+
+</div>
+
+<script src="/js/add_task.tasks.js"></script>

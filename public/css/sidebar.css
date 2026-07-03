@@ -1,0 +1,71 @@
+:root {
+    --sidebar-width: 260px;
+    --primary-color: #2062d5;
+    --bg-color: #f3f4f6;
+    --card-bg: #ffffff;
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+}
+/* Sidebar Styles */
+.sidebar {
+    width: 260px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-right: 1px solid #e5e7eb;
+    position: fixed;
+    height: 100%;
+    left: 0;
+}
+
+.profile-section {
+    text-align: center;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.profile-name { font-weight: bold; color: var(--text-dark); }
+.profile-role { font-size: 0.85rem; color: var(--text-light); }
+
+.nav-links a{
+    display: block;
+    padding: 12px 15px;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background-color: #2062d5;
+    color: white;
+}
+
+.logout-container button{
+    display: block;
+    padding: 12px 15px;
+    border: none;
+    width: 100%;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.logout-container button:hover{
+    background-color: #2062d5;
+    color: white;
+}

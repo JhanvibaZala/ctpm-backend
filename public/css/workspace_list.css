@@ -1,0 +1,34 @@
+ .card-btn{
+            margin-top: 10px;
+        }
+        .workspace-btn {
+            background-color: transparent;
+
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #workspace-delete-btn {
+            color: #ef4444;
+            /* Tailwind Red-500 */
+            border: 1px solid #ef4444;
+        }
+
+
+
+        /* Hover State (Danger Zone) */
+        #workspace-delete-btn:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }

@@ -1,0 +1,281 @@
+.edit-modal-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,0.45);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:1000;
+
+}
+
+
+
+
+
+.edit-modal{
+
+    width:700px;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    background:white;
+
+    border-radius:14px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.2);
+
+}
+
+
+
+
+
+.edit-modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:22px;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+
+
+.edit-modal-header h2{
+
+    margin:0;
+
+    font-size:24px;
+
+}
+
+
+
+.edit-modal-header p{
+
+    margin-top:5px;
+
+    color:#6b7280;
+
+}
+
+
+
+
+
+.edit-close-btn{
+
+    border:none;
+
+    background:none;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+.edit-body{
+
+    padding:25px;
+
+}
+
+
+
+
+.edit-full-field,
+.edit-field{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+
+
+.edit-full-field input,
+.edit-field input,
+.edit-field select,
+.edit-description textarea{
+
+
+    padding:12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+}
+
+
+
+
+.edit-grid{
+
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+    margin-top:20px;
+
+}
+
+
+
+
+
+.edit-checkbox{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:30px;
+
+}
+
+
+
+
+
+.edit-description{
+
+    margin-top:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+
+
+.edit-description textarea{
+
+    height:120px;
+
+    resize:none;
+
+}
+
+
+
+
+.edit-upload{
+
+    margin-top:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+
+
+
+
+.edit-footer{
+
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+
+    padding:20px;
+
+    border-top:1px solid #e5e7eb;
+
+}
+
+
+
+
+.edit-cancel-btn,
+.edit-save-btn{
+
+
+    padding:11px 25px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+}
+
+
+
+
+
+.edit-cancel-btn{
+
+    background:#e5e7eb;
+
+}
+
+
+
+
+
+.edit-save-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+
+.edit-save-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+.edit-cancel-btn:hover{
+
+    background:#d1d5db;
+
+}

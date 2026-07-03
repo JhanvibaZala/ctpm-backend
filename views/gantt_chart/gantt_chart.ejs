@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gantt Chart</title>
+  <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+    <link rel="stylesheet" href="/css/project-navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="/css/gantt.css">
+</head>
+<body>
+  <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+    <div class="main-container">
+
+    <div >
+
+      <%- include('../common/sidebar') %>
+    </div>
+<div class="page">
+        <%- include('../common/navbar') %>
+
+
+  <h2>Gantt Chart view</h2>
+
+  <!-- ── Form ── -->
+  <!-- <div class="form-card">
+    <form method="POST" action="/gantt/viewGantt" style="display:contents">
+      <div class="form-group">
+        <label for="project_id">Project ID</label>
+        <input
+          type="text"
+          id="project_id"
+          name="project_id"
+          placeholder="e.g. 2b88d8c0-9657-49a6-937b-bc79d982318d"
+          value="<%= locals.project_id || '' %>"
+          required
+        />
+      </div>
+      <button type="submit" class="btn-submit">View Gantt Chart →</button>
+    </form>
+  </div> -->
+
+  <!-- ── Error ── -->
+  <% if (locals.err) { %>
+    <div class="error-box"><%= err %></div>
+  <% } %>
+
+  <!-- ── Chart (only when data exists) ── -->
+  <% if (locals.project_tasks && project_tasks.length > 0) { %>
+
+    <div class="legend" id="status-legend"></div>
+
+    <div class="gantt-outer">
+      <div class="gantt-inner" id="gantt-inner">
+        <div class="gantt-head">
+          <div class="col-label">Task</div>
+          <div class="col-timeline" id="header-tl"></div>
+        </div>
+        <div id="gantt-body" style="position:relative"></div>
+      </div>
+    </div>
+
+    <div class="detail" id="detail-panel"></div>
+
+    <script>
+              const RAW    = <%- JSON.stringify(project_tasks) %>;
+      const RAW_STATUS = <%- JSON.stringify(project_statuses) %>
+    </script>
+
+    <script src="/js/gantt.js"></script>
+
+  <% } else if (!locals.err) { %>
+    <div class="empty-state">Enter a project ID above to view its Gantt chart.</div>
+  <% } %>
+    </div>
+
+</div>
+</body>
+</html>

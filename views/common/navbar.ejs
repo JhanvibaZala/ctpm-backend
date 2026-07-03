@@ -1,0 +1,66 @@
+<div class="project-navbar-container">
+    <div class="project-navbar-top">
+        <div class="project-navbar-title">
+            <h2>Project: <%= project.project_name %></h2>
+            <% if (project.status) { %>
+                <span class="nav-status-badge <%= project.status.toLowerCase().replace(' ', '-') %>">
+                    <%= project.status %>
+                </span>
+            <% } %>
+            <% if (project.priority_level) { %>
+                <span class="priority-badge <%= project.priority_level.toLowerCase() %>">
+                    <%= project.priority_level %>
+                </span>
+            <% } %>
+            <% if (project.deadline_at) { %>
+      <div class="kb-badge kb-badge--deadline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Due <%= new Date(project.deadline_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) %>
+      </div>
+    <% } %>
+        </div>
+        
+        <div class="project-navbar-actions">
+            <button class="btn-add" id="addTaskBtn" onclick="openTaskModal()">+ New Task</button>
+        </div>
+    </div>
+
+    <div class="project-navbar-tabs">
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/tasks" class="nav-tab" id="tab-tasks">
+            <i class="fa-solid fa-list"></i> List View
+        </a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/kanban" class="nav-tab" id="tab-kanban">
+            <i class="fa-solid fa-table-columns"></i> Kanban Board
+        </a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/gantt" class="nav-tab" id="tab-gantt">
+            <i class="fa-solid fa-chart-gantt"></i> Gantt Chart
+        </a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/burnChart" class="nav-tab" id="tab-burn">
+            <i class="fa-solid fa-fire-flame-curved"></i> Burn Charts
+        </a>
+        <a href="/api/workspaces/<%= workspace_id %>/projects/<%= project_id %>/calendar" class="nav-tab" id="tab-calendar">
+            <i class="fa-solid fa-calendar"></i> Calendar
+        </a>
+    </div>
+</div>
+
+<script>
+    // Automatically highlight the active tab based on the current URL
+    document.addEventListener("DOMContentLoaded", () => {
+        const currentPath = window.location.pathname;
+        
+        if (currentPath.includes("/tasks")) {
+            document.getElementById("tab-tasks").classList.add("active");
+        } else if (currentPath.includes("/kanban")) {
+            document.getElementById("tab-kanban").classList.add("active");
+        } else if (currentPath.includes("/gantt")) {
+            document.getElementById("tab-gantt").classList.add("active");
+        } else if (currentPath.includes("/burnChart")) {
+            document.getElementById("tab-burn").classList.add("active");
+        } else if (currentPath.includes("/calendar")) {
+            document.getElementById("tab-calendar").classList.add("active");
+        }
+    });
+</script>

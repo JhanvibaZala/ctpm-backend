@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+    <link rel="stylesheet" href="/css/project-navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* this css for sidebar and different for each page  */
+        .task-active{
+            background-color: #2062d5;
+            color: white !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast"></div>
+    <%- include("./add_task.ejs", {errors: errors}) %>
+    <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+
+    <!-- create project popup template file -->
+
+    <div class="container">
+
+    <!-- sidebar tempalte  -->
+    <%- include('../common/sidebar') %>
+    <!-- Main Screen -->
+    <main class="main-content">
+        <%- include('../common/navbar') %>
+        <!-- <header class="header">
+            <h2>Project: <%= project.project_name %></h2>
+            <button class="btn-add" id="addTaskBtn" onclick="openTaskModal()">+ New Task</button>
+        </header> -->
+        
+        <!-- <div class="task-main-container">
+            <div class="task-container">
+                <div class="task-bar-header">
+                    <p class="large-text">jkb</p>
+                </div>
+            </div>
+        </div> -->
+
+        <table class="task-table">
+            <thead class="task-header">
+                <th>Task Name</th>
+                <th>Task status</th>
+                <th>Priority Level</th>
+                <th>Extimated Hours</th>
+                <th>Start Date</th>
+                <th>Due Date</th>
+                <th>Completed</th>
+                <th>Action</th>
+            </thead>
+            <tbody class="task-body">
+                <% tasks.forEach(task => { %>
+                    <tr>
+                        <td><%= task.taskName %></td>
+                        <td>
+                            <span class="status-badge">
+                                <%= task.statusText %>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="priority-badge <%= task.priorityLevel.toLowerCase() %>">
+                                <%= task.priorityLevel %>
+                            </span>
+                        </td>
+                        <td><%= task.estimatedHours %></td>
+                        <td><%= task.startDate.toDateString() %></td>
+                        <td><%= task.dueAt.toDateString() %></td>
+                        <td><%= task.completedAt ? "Completed" : "Not completed" %></td>
+                        <td>
+                            <button onclick="viewTask('<%= workspace_id %>', '<%= project_id %>', '<%= task.id %>')">View</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </main>
+    </div>
+</body>
+
+</html>
+
+<script>
+
+function openTaskModal(){
+    document.getElementById(
+        "taskModal"
+    ).style.display = "flex";
+}
+
+
+
+function closeTaskModal(){
+    document.getElementById(
+        "taskModal"
+    ).style.display = "none";
+}
+
+function viewTask(workspace_id, project_id, taskId) {
+    window.location.href = `/api/workspaces/${workspace_id}/projects/${project_id}/tasks/${taskId}`;
+}
+
+</script>
+
+<% if(openModal){ %>
+<script>
+    document.getElementById("taskModal").style.display="flex";
+</script>
+<% } else { %>
+<script>
+    document.getElementById("taskModal").style.display="none"
+</script>
+    <% } %>

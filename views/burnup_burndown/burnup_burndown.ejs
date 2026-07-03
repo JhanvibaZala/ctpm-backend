@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Burn-up / Burn-down</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #f5f5f5; color: #1a1a1a; }
+
+    .page { padding: 24px; max-width: 1800px; margin: 0 auto; 
+padding-top: 34px;
+    padding-left: 270px; }
+
+    h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+
+    /* ── Form ── */
+    .form-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+      padding: 20px 24px; margin-bottom: 24px;
+      display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 260px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: #888; }
+    .form-group input {
+      padding: 9px 12px; border: 1px solid #e0e0e0; border-radius: 7px;
+      font-size: 13px; color: #1a1a1a; outline: none;
+      transition: border-color .15s; font-family: monospace;
+    }
+    .form-group input:focus { border-color: #60a5fa; }
+    .form-group input::placeholder { color: #bbb; }
+    .btn-submit {
+      padding: 9px 20px; background: #1a1a1a; color: #fff;
+      border: none; border-radius: 7px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s; white-space: nowrap;
+    }
+    .btn-submit:hover { background: #333; }
+
+    /* ── Error ── */
+    .error-box {
+      background: #fff0f0; border: 1px solid #f5c2c2; color: #a33;
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;
+    }
+
+    /* ── Stats row ── */
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+      padding: 14px 20px; flex: 1; min-width: 140px;
+    }
+    .stat-card .label { font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+    .stat-card .value.green  { color: #16a34a; }
+    .stat-card .value.orange { color: #ea580c; }
+    .stat-card .value.blue   { color: #2563eb; }
+
+    /* ── Charts ── */
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 720px) { .charts { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+      padding: 20px;
+    }
+    .chart-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .chart-card p  { font-size: 12px; color: #999; margin-bottom: 16px; }
+    .chart-card canvas { width: 100% !important; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: #999; font-size: 14px; }
+  </style>
+   <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+    <link rel="stylesheet" href="/css/project-navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+   <nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+    </nav>
+
+    <div >
+  
+        <%- include('../common/sidebar') %>
+      </div>
+
+<div class="page">
+        <%- include('../common/navbar') %>
+
+  <h2>Burn-up / Burn-down Charts</h2>
+
+  <!-- Form
+  <div class="form-card">
+    <form method="POST" action="/bubd/viewBUBD" style="display:contents">
+      <div class="form-group">
+        <label for="projectId">Project ID</label>
+        <input
+          type="text"
+          id="projectId"
+          name="projectId"
+          placeholder="e.g. 2b88d8c0-9657-49a6-937b-bc79d982318d"
+          value="<%= locals.project ? locals.project.id : '' %>"
+          required
+        />
+      </div>
+      <button type="submit" class="btn-submit">Generate Charts →</button>
+    </form>
+  </div> -->
+
+  <!-- Error -->
+  <% if (locals.error) { %>
+    <div class="error-box"><%= error %></div>
+  <% } %>
+
+  <!-- Charts -->
+  <% if (locals.project && locals.totalTasks > 0) { %>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="label">Project</div>
+        <div class="value" style="font-size:16px"><%= project.project_name %></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total Tasks</div>
+        <div class="value blue"><%= totalTasks %></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Completed</div>
+        <div class="value green"><%= burnupData[burnupData.length - 1] %></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Remaining</div>
+        <div class="value orange"><%= burndownData[burndownData.length - 1] %></div>
+      </div>
+      <% if (project.deadline_at) { %>
+      <div class="stat-card">
+        <div class="label">Deadline</div>
+        <div class="value" style="font-size:15px">
+          <%= new Date(project.deadline_at).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Chart grid -->
+    <div class="charts">
+
+      <!-- Burn-up -->
+      <div class="chart-card">
+        <h3>Burn-up Chart</h3>
+        <p>Cumulative tasks completed vs total scope over time.</p>
+        <canvas id="burnupChart" height="260"></canvas>
+      </div>
+
+      <!-- Burn-down -->
+      <div class="chart-card">
+        <h3>Burn-down Chart</h3>
+        <p>Remaining tasks over time vs ideal completion rate.</p>
+        <canvas id="burndownChart" height="260"></canvas>
+      </div>
+
+    </div>
+
+    <script>
+      const labels       = <%- JSON.stringify(labels) %>;
+      const burnupData   = <%- JSON.stringify(burnupData) %>;
+      const burndownData = <%- JSON.stringify(burndownData) %>;
+      const idealData    = <%- JSON.stringify(idealData) %>;
+      const totalTasks   = <%= totalTasks %>;
+
+      const commonOptions = {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} tasks` } },
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+            grid:  { color: '#f0f0f0' },
+          },
+          y: {
+            beginAtZero: true,
+            suggestedMax: totalTasks + 1,
+            ticks: { font: { size: 11 }, stepSize: 1 },
+            grid:  { color: '#f0f0f0' },
+          },
+        },
+      };
+
+      // ── Burn-up ──────────────────────────────────────────────────────────
+      new Chart(document.getElementById('burnupChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label:           'Completed tasks',
+              data:            burnupData,
+              borderColor:     '#16a34a',
+              backgroundColor: 'rgba(22,163,74,0.08)',
+              borderWidth:     2,
+              pointRadius:     2,
+              pointHoverRadius: 5,
+              fill:            true,
+              tension:         0.3,
+            },
+            {
+              label:           'Total scope',
+              data:            Array(labels.length).fill(totalTasks),
+              borderColor:     '#94a3b8',
+              borderWidth:     1.5,
+              borderDash:      [6, 4],
+              pointRadius:     0,
+              fill:            false,
+            },
+          ],
+        },
+        options: commonOptions,
+      });
+
+      // ── Burn-down ────────────────────────────────────────────────────────
+      new Chart(document.getElementById('burndownChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label:           'Remaining tasks',
+              data:            burndownData,
+              borderColor:     '#ea580c',
+              backgroundColor: 'rgba(234,88,12,0.08)',
+              borderWidth:     2,
+              pointRadius:     2,
+              pointHoverRadius: 5,
+              fill:            true,
+              tension:         0.3,
+            },
+            {
+              label:           'Ideal burn-down',
+              data:            idealData,
+              borderColor:     '#94a3b8',
+              borderWidth:     1.5,
+              borderDash:      [6, 4],
+              pointRadius:     0,
+              fill:            false,
+            },
+          ],
+        },
+        options: commonOptions,
+      });
+    </script>
+
+  <% } else if (locals.project && locals.totalTasks === 0) { %>
+    <div class="empty-state">This project has no tasks yet.</div>
+  <% } else if (!locals.error) { %>
+    <div class="empty-state">Enter a project ID above to generate charts.</div>
+  <% } %>
+
+</div>
+</body>
+</html>

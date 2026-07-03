@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/kanban.css" />
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/project_modal_overlay.css">
+    <link rel="stylesheet" href="/css/show-task.css">
+    <link rel="stylesheet" href="/css/addTask.css">
+    <link rel="stylesheet" href="/css/project-navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+</head>
+<body>
+
+<!-- ═══════════════════════════ TOP BAR ═══════════════════════════ -->
+<nav class="navbar">
+        <div class="project-name">Project Variyari</div>
+</nav>
+
+<div class="container">
+    
+    <%- include('../common/sidebar') %>
+    <div class="main-content">
+        <%- include('../common/navbar') %>
+
+
+
+
+<!-- ═══════════════════════════ BOARD ═══════════════════════════ -->
+<div class="kanban-wrapper">
+
+<main class="kb-board" id="kanbanBoard"
+      data-workspace="<%= workspace_id %>"
+      data-project="<%= project_id %>">
+     
+
+  <% columns.forEach(function(col, colIndex) { %>
+    <div class="kb-column"
+         data-status-id="<%= col.id %>"
+         data-col-index="<%= colIndex %>"
+         style="--col-accent: var(--col-<%= colIndex % 8 %>);">
+
+      <!-- Column header -->
+      <div class="kb-column__header">
+        <div class="kb-column__header-left">
+          <span class="kb-column__dot"></span>
+          <h2 class="kb-column__title"><%= col.status_text %></h2>
+        </div>
+        <span class="kb-column__count" id="count-<%= col.id %>"><%= col.tasks.length %></span>
+      </div>
+
+      <!-- Drop zone -->
+      <div class="kb-column__body" data-status-id="<%= col.id %>">
+
+        <% col.tasks.forEach(function(task) { %>
+          <div class="kb-card"
+               draggable="true"
+               data-task-id="<%= task.id %>"
+               data-status-id="<%= task.status_id %>">
+
+            <!-- Priority stripe -->
+            <div class="kb-card__stripe kb-card__stripe--<%= task.priority_level.toLowerCase() %>"></div>
+
+            <div class="kb-card__body">
+              <!-- Task name -->
+              <p class="kb-card__title"><%= task.task_name %></p>
+
+              <% if (task.description) { %>
+                <p class="kb-card__desc"><%= task.description.substring(0, 80) %><%= task.description.length > 80 ? '…' : '' %></p>
+              <% } %>
+
+              <!-- Footer row -->
+              <div class="kb-card__footer">
+                <div class="kb-card__footer-left">
+                  <!-- Priority badge -->
+                  <span class="kb-pill kb-pill--<%= task.priority_level.toLowerCase() %>">
+                    <%= task.priority_level %>
+                  </span>
+
+                  <!-- Due date -->
+                  <% if (task.due_at) {
+                       const now   = new Date();
+                       const due   = new Date(task.due_at);
+                       const over  = due < now;
+                       const soon  = !over && (due - now) < 86400000 * 2;
+                  %>
+                    <span class="kb-pill kb-pill--date <%= over ? 'kb-pill--overdue' : (soon ? 'kb-pill--soon' : '') %>">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      <%= due.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) %>
+                    </span>
+                  <% } %>
+                </div>
+
+                <!-- Assignee avatars -->
+                <% if (task.members && task.members.length > 0) { %>
+                  <div class="kb-card__avatars">
+                    <% task.members.slice(0,3).forEach(function(m) { %>
+                      <span class="kb-card__avatar" title="<%= m.name %>">
+                        <%= (m.name || '?').charAt(0).toUpperCase() %>
+                      </span>
+                    <% }) %>
+                    <% if (task.members.length > 3) { %>
+                      <span class="kb-card__avatar kb-card__avatar--more">+<%= task.members.length - 3 %></span>
+                    <% } %>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+          </div><!-- .kb-card -->
+        <% }) %>
+
+        <!-- Empty state placeholder (shown when column has no cards) -->
+        <div class="kb-empty <%= col.tasks.length > 0 ? 'kb-empty--hidden' : '' %>" data-empty-for="<%= col.id %>">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity=".35">
+            <rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 13h4"/>
+          </svg>
+          <span>Drop tasks here</span>
+        </div>
+
+      </div><!-- .kb-column__body -->
+    </div><!-- .kb-column -->
+  <% }) %>
+
+</main>
+</div>
+
+    </div>
+
+ </div>
+
+
+<!-- ═══════════════════ TOAST NOTIFICATION ═══════════════════════ -->
+<div class="kb-toast" id="kbToast" role="alert" aria-live="assertive"></div>
+
+<script src="/js/kanban.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+/* Container Alignment */
+.card-btn {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px; /* Spacing from card content */
+}
+
+/* Button Base Style */
+.project-btn {
+    background-color: transparent;
+    
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#project-delete-btn{
+    color: #ef4444; /* Tailwind Red-500 */
+    border: 1px solid #ef4444;
+}
+
+#project-edit-btn{
+    color:  #2062d5; /* Tailwind Red-500 */
+    border: 1px solid  #2062d5;
+}
+
+/* Hover State (Danger Zone) */
+#project-delete-btn:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Active/Click State */
+#project-delete-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+    background-color: #dc2626; /* Darker red */
+    border-color: #dc2626;
+}
+
+/* Icon Animation */
+#project-delete-btn i {
+    font-size: 16px;
+}
+
+#project-delete-btn:hover i {
+    animation: trash-shake 0.4s ease-in-out;
+}
+
+@keyframes trash-shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-12deg); }
+    75% { transform: rotate(12deg); }
+}   

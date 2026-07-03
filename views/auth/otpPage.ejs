@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP</title>
+    <link rel="stylesheet" href="/css/forgotPassword.css" />
+
+    <link rel="stylesheet" href="/css/auth-style.css" />
+  </head>
+  <body>
+ 
+    <div class="main-container">
+      <div class="main-wrapper flex-center">
+        <div class="box-container">
+          <div class="primary-box">
+            <div class="title">
+            <h1 class="pre-font" id="title-text">PROJECTCORE</h1>
+            <h3 class="pre-font" id="title-desc-text">Collaborative Task & Project Management Tool</h3>
+            </div>
+            <div class="log-box-container ">
+                <p class="pre-font" id="log-text">OTP Page</p>
+                <p class="pre-font" id="log-desc-text" >Please enter your otp from your Gmail</p>
+                <div class="log-box">
+                    <form action="/otp" method="post" id="log-form">
+
+                 
+                    <label for="otp" class="label-text">Enter OTP </label>
+                    <input type="text" name="otp" id="otp" value="<%= locals.form ? form.otp : '' %>" required class="inp-field">
+                    <input type="submit" value="NEXT" name="" id="submit-btn">
+                       </form>
+                       <br>
+                        <% if (typeof error !== 'undefined' && error) { %>
+                            <div style="color: red; margin-bottom: 15px; padding: 10px;">
+                                <%= error %>
+                            </div>
+                        <% } %>
+                                <div id="resend-container" style="margin-top: 10px;">
+                                    <button id="resend-btn" disabled class="resend-btn">
+                                        Resend OTP in <span id="countdown">1:00</span>
+                                    </button>
+                                    <p id="resend-msg" style="color: green; margin-top: 8px;"></p>
+                                    <p id="resend-err" style="color: red; margin-top: 8px;"></p>
+                                </div>
+                </div>
+            </div>
+            
+          </div>
+          <div class="cover-box">
+            <img src="/images/cover_img.jpg" id="cover-img" alt="">
+          </div>
+        </div>
+          
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+      const resendBtn = document.getElementById("resend-btn");
+    const countdownEl = document.getElementById("countdown");
+    const resendMsg = document.getElementById("resend-msg");
+    const resendErr = document.getElementById("resend-err");
+
+    let timer = null;
+
+    function startCountdown(seconds = 60) {
+        resendBtn.disabled = true;
+        resendBtn.classList.remove("active");
+        let remaining = seconds;
+
+        timer = setInterval(() => {
+            remaining--;
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            countdownEl.textContent = `${mins}:${secs.toString().padStart(2, "0")}`;
+
+            if (remaining <= 0) {
+                clearInterval(timer);
+                resendBtn.disabled = false;
+                resendBtn.classList.add("active");
+                resendBtn.textContent = "Resend OTP";
+            }
+        }, 1000);
+    }
+
+    // Start countdown as soon as OTP page loads
+    startCountdown(60);
+
+    resendBtn.addEventListener("click", async () => {
+        resendMsg.textContent = "";
+        resendErr.textContent = "";
+
+        try {
+            const resp = await fetch("/otp/resend-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const data = await resp.json();
+            const otp=data.data.otp;
+
+            if (!resp.ok) {
+                resendErr.textContent = data.message || "Failed to resend OTP.";
+                return;
+            }
+
+            resendMsg.textContent = "OTP resent! Check your email.";
+            // Reset countdown after successful resend
+            resendBtn.innerHTML = `Resend OTP in <span id="countdown">1:00</span>`;
+            // Re-grab the span since we replaced innerHTML
+            startCountdown(60);
+
+
+
+      window.open(`/gmail/${otp}`, "_blank");
+      window.location.href = "/otp";
+
+
+        } catch (err) {
+            resendErr.textContent = "Network error. Please try again.";
+        }
+    });
+</script>

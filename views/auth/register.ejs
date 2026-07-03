@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="/css/auth-style.css" />
+  </head>
+  <body>
+      <% 
+        // Helper function to extract errors by field name
+        const getError = (fieldName) => {
+            if (!locals.errors) return '';
+            const errorObj = locals.errors.find(e => e.field === fieldName);
+            return errorObj ? errorObj.message : '';
+        }
+    %>
+    <div class="main-container">
+      <div class="main-wrapper flex-center">
+        <div class="box-container">
+          <div class="primary-box">
+            <div class="title">
+            <h1 class="pre-font" id="title-text">PROJECTCORE</h1>
+            <h3 class="pre-font" id="title-desc-text">Collaborative Task & Project Management Tool</h3>
+            </div>
+            <div class="log-box-container ">
+                <p class="pre-font" id="log-text">Create Account</p>
+                <p class="pre-font" id="log-desc-text" >join us today by entering your details below.</p>
+                <div class="log-box">
+                    <form action="/register" method="post"  onsubmit="return validateRegisterForm()"  id="log-form">
+
+                 <div  class="inp-container">
+                   
+                     <div class="inpfield-content">
+            <label for="first_name" class="label-text">First name </label>
+            <input type="text" name="first_name" id="first-name" class="inp-field" required value="<%= locals.form ? form.first_name : '' %>">
+            <span class="err" id="fnameErr" style="color: red;"><%= getError('first-name') %></span>
+        </div>
+        <div class="inpfield-content">
+            <label for="last_name" class="label-text">Last name </label>
+            <input type="text" name="last_name" id="last-name" class="inp-field" required value="<%= locals.form ? form.last_name : '' %>">
+            <span class="err" id="lnameErr" style="color: red;"><%= getError('last-name') %></span>
+        </div>
+                    
+                     
+                </div>
+                <div  class="inp-container"  >
+                    <div class="inpfield-content">
+            <label for="username" class="label-text">Username</label>
+            <input type="text" name="username" id="username" class="inp-field" required value="<%= locals.form ? form.username : '' %>">
+            <span class="err" id="unameErr" style="color: red;"><%= getError('username') %></span>
+        </div>
+        <div class="inpfield-content">
+            <label for="password" class="label-text">Password</label>
+            <input type="password" name="password" id="password" class="inp-field" required>
+            <span class="err" id="passErr" style="color: red;"><%= getError('password') %></span>
+        </div>
+
+                </div>
+               <div class="inp-container"  >
+                <div style="width: 100%; " >
+
+                    <label for="email" class="label-text" >Email</label>
+                    <input type="email" name="email" class="inp-field" required id="email" value="<%= locals.form ? form.email : '' %>">
+                    <span class="err" id="emailErr" style="color: red;"><%= getError('email') %></span>
+                </div>
+        </div>
+        <button type="submit" id="submit-btn">Register</button>
+    </form>
+    <br>
+    <a href="/login" >Already have an account? Login here.</a>
+    <% if (typeof err !== 'undefined') { %>
+        <p style="color: red;"><%= err %></p>
+    <% } %>           
+                </div>
+            </div>
+            
+          </div>
+          <div class="cover-box">
+            <img src="/images/cover_img.jpg" id="cover-img" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/js/register.validations.js"></script>
+  </body>
+</html>
