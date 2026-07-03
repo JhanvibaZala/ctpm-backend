@@ -44,7 +44,7 @@ export async function RegisterController(req: Request, res: Response) {
                             message: "Email already exists",
                         },
                     ],
-                });
+                })
             }
 
             if (err.message.includes("username")) {
