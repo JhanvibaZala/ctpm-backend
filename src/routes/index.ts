@@ -10,7 +10,6 @@ import loginRouter from "../modules/auth/routes/login.router";
 import forgotPasswordRouter from "../modules/auth/routes/forgotPassword.router";
 import otpRouter from "../modules/auth/routes/otp.router";
 import resetPasswordRouter from "../modules/auth/routes/resetPassword.router";
-import gmailRouter from "../modules/auth/routes/gmail.router";
 import taskRouter from "../modules/tasks/routes/tasks.router";
 import { createCommentRouter } from "../modules/tasks/routes/comments.routes";
 import { errorHandler } from "../middlewares/error.middleware";
@@ -68,10 +67,9 @@ export function createMasterRouter(
   router.use("/api/login", loginRouter);
   router.use("/api/forgot-password", forgotPasswordRouter);
   router.use("/api/reset-password", resetPasswordRouter);
-  router.use("api//otp", otpRouter);
+  router.use("/api/otp", otpRouter);
   router.use("/api/auth", authRouter);
-  router.use("/aqpi/gmail", gmailRouter);
-  router.use("api//dashboard", authMiddleware, dashboardRouter); // add middleware here later to protect this route
+  router.use("/api/dashboard", authMiddleware, dashboardRouter); // add middleware here later to protect this route
   router.use(
     "/api/workspaces",
     authMiddleware,

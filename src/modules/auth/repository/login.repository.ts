@@ -11,7 +11,7 @@ export class LoginRepository {
           
             return rows as RowDataPacket[];
         } catch (error) {
-            console.log("failed to check login details in repository");
+            console.error("failed to check login details in repository");
             throw error;
         }
     }
@@ -22,7 +22,7 @@ export class LoginRepository {
             const [rows] = await db.execute<ResultSetHeader>(sql, [password, email, email]);
             return rows.affectedRows > 0;
         } catch (error) {
-            console.log("failed to check login details in repository");
+            console.error("failed to check login details in repository");
             throw error;
         }
     }

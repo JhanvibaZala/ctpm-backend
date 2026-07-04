@@ -28,7 +28,7 @@ export class LoginService {
             return user_details[0];
 
         } catch (error) {
-            console.log(error)
+           console.error(error)
             throw error;
         }
     }
@@ -41,7 +41,7 @@ export class LoginService {
             return [user_details];
 
         }catch (error) {
-            console.log(error)
+           console.error(error)
             throw error;
         }
     }
@@ -54,14 +54,14 @@ export class LoginService {
 
 
     // create otp for user using email id 
-    async createOtp(email: string, hashedOtp: string, sessionId: string): Promise<Boolean> {
+    async createOtp(email: string, hashedOtp: string, sessionId: string) {
         try {
             await this.otpRepo.deleteOtpByEmail(email);
             // generate uuid
             const otpId = v4();
             return await this.otpRepo.addOtp(otpId, email, hashedOtp, sessionId);
         } catch (error) {
-            console.log(error);
+           console.error(error);
             throw error;
         }
     }
@@ -77,15 +77,13 @@ export class LoginService {
             const isOtpCorrect = await bcrypt.compare(otp, otpRow.hashed_otp);
             const otpExpiration = new Date(otpRow.expires_at);
             const now = new Date();
-            if(!isOtpCorrect || now < otpExpiration) {
+            if(!isOtpCorrect || now > otpExpiration) {
                 return false;
             }
-            else{
-                return true;
-            }
+            return true;
             
         } catch (error) {
-            console.log(error);
+           console.error(error);
             throw error;
         }
     }
@@ -136,9 +134,10 @@ export class LoginService {
             if(isSame) {
                 return {success: false, errors : [
                     {
-                        message: "entered password is same as old password"
-                    }
-                ]}
+                        field:"password",
+                        message: "Password is same as old password"
+                    }]
+                }
             }
 
             // hash password and save in database
@@ -148,16 +147,15 @@ export class LoginService {
             if(!setNewPassword) {
                 return {success: false, errors: [
                     {
+                        field:"password",
                         message: "failed to reset password!"
-                    }
-                ]};
+                    }]
+                };
             }
-
-            console.log("password reset successful!");
             return {success: true};
 
         } catch (error) {
-            console.log(error);
+           console.error(error);
             throw error;
         }
     }

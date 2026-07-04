@@ -3,13 +3,17 @@ import db from "../../../config/dbconfig";
 
 export class OtpRepository {
 
-    async addOtp(otpId: string, email: string, hashedOtp: string, sessionId: string): Promise<boolean> {
+    async addOtp(otpId: string, email: string, hashedOtp: string, sessionId: string) {
         try {
-            const sql = `INSERT INTO active_otps (id, user_email, hashed_otp, session_id) VALUES (?, ?, ?, ?)`;
-            const result: any = await db.execute<RowDataPacket[]>(sql, [otpId, email, hashedOtp, sessionId]);
-            return result[0].affectedRows > 0;
+            const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes
+            const sql = `INSERT INTO active_otps (id, user_email, hashed_otp, session_id, expires_at) VALUES (?, ?, ?, ?, ?)`;
+            const result: any = await db.execute<RowDataPacket[]>(sql, [otpId, email, hashedOtp, sessionId, expiresAt]);
+            if(result[0].affectedRows > 0) {
+                return expiresAt
+            }
+            return null
         } catch (error) {
-            console.log("failed to add otp details in repository");
+            console.error("failed to add otp details in repository");
             throw error;
         }
     }
@@ -20,7 +24,7 @@ export class OtpRepository {
             const sql = `DELETE FROM active_otps WHERE user_email = ?`;
             await db.execute(sql, [email]);
         } catch (error) {
-            console.log("failed to delete otp in repository");
+            console.error("failed to delete otp in repository");
             throw error;
         }
     }
@@ -31,7 +35,7 @@ export class OtpRepository {
             const [result]: any = await db.execute<RowDataPacket[]>(sql, [email]);
             return result[0];
         } catch (error) {
-            console.log("failed to get otp details in repository");
+            console.error("failed to get otp details in repository");
             throw error;
         }
     }
@@ -45,7 +49,7 @@ export class OtpRepository {
             const [result]: any = await db.execute<RowDataPacket[]>(sql, [email]);
             return result[0].count;
         } catch (error) {
-            console.log("failed to count otps in repository");
+            console.error("failed to count otps in repository");
             throw error;
         }
     }

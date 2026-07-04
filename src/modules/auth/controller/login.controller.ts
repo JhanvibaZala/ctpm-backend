@@ -93,7 +93,7 @@ export const loginUser = async (req: Request, res: Response) => {
         })
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         
         // Never send raw err.message to the frontend in a 500 crash
         return res.status(500).json({
@@ -115,12 +115,10 @@ export const getUserDetails = async (req: Request, res: Response) => {
         }
         const user = await loginService.findUserByEmail(email);
         if(!user) {
-            console.log("not found")
             return res.status(401).json({
                 message: "user not found!"
             });
         }
-        console.log("found")
         return res.status(200).json({
             message: "user found!"
         });

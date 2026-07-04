@@ -3,7 +3,7 @@ import { IUser } from "../interfaces/user_obj.interface";
 import { RegisterService } from "../services/register.service";
 import { IUserDto } from "../dto/register.dto";
 
-export async function RegisterController(req: Request, res: Response) {
+export async function handleRegister(req: Request, res: Response) {
     const userObj = req.body as IUserDto; // Extract this early so the catch block can use it
 
     try {
@@ -36,11 +36,9 @@ export async function RegisterController(req: Request, res: Response) {
             if (err.message.includes("email")) {
                 return res.status(409).json({
                     success: false,
-
                     errors: [
                         {
                             field: "email",
-
                             message: "Email already exists",
                         },
                     ],
@@ -50,11 +48,9 @@ export async function RegisterController(req: Request, res: Response) {
             if (err.message.includes("username")) {
                 return res.status(409).json({
                     success: false,
-
                     errors: [
                         {
                             field: "username",
-
                             message: "Username already exists",
                         },
                     ],
@@ -62,7 +58,7 @@ export async function RegisterController(req: Request, res: Response) {
             }
         }
 
-        console.log(err);
+        console.error(err);
         return res.status(500).json({
             success: false,
             message: "Internal server error",

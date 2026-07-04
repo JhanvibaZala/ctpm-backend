@@ -4,12 +4,6 @@ import bcrypt from 'bcrypt';
 import crypto from "crypto";
 import { generateResetToken } from "../../../utils/jwt.utils";
 
-
-export const showForgotPasswordPage = async (req: Request, res: Response) => {
-    res.render("auth/forgotPassword");
-}
-
-
 export const forgotPasswordHandler = async (req: Request, res: Response) => {
     const input = req.body.email; // could be email OR username
 
@@ -24,11 +18,12 @@ export const forgotPasswordHandler = async (req: Request, res: Response) => {
         }
 
         // ✅ Returns the actual user row, not just true/false
-        const user = await loginService.check_email(input);
+        const user: any = await loginService.findUserByEmail(input);
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "No account found with that email or username."
+            return res.status(200).json({
+                success: true,
+                message: "OTP sent to your registered email address",
+                data: { otp: 1, expiresIn: Date.now() + 1000 * 60 * 2, resendAfter: 30 } 
             });
         }
 
@@ -44,7 +39,7 @@ export const forgotPasswordHandler = async (req: Request, res: Response) => {
 
         // Generate OTP
         const otp = crypto.randomInt(100000, 1000000).toString();
-        (req.session as any).otp = otp;
+        // (req.session as any).otp = otp;
         const otpSessionId = req.sessionID;
 
         const hashedOtp = await bcrypt.hash(otp, 10);
@@ -62,16 +57,14 @@ export const forgotPasswordHandler = async (req: Request, res: Response) => {
         return res.status(200).json({
             success: true,
             message: "OTP sent to your registered email address.", // ✅ clean message
-            data: { otp } // remove this in production, only for dev/testing
+            data: { otp: otp, expiresIn: createOtp.getTime(), resendAfter: 30 } // remove this in production, only for dev/testing
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({
             success: false,
             message: "Something went wrong. Please try again."
         });
     }
 }
-
-

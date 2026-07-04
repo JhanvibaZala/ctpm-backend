@@ -56,7 +56,7 @@ const checkProjectPermission = (permission: string) => {
             else return res.send("[PROJECT] you don't have necesary permissions for this particular action.")
 
         } catch (err) {
-            console.log(err)
+            console.error(err)
             return res.render('err', { err: err })
         }
     }

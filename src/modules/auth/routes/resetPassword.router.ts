@@ -1,11 +1,8 @@
 import { Router } from "express";
-import { showResetPasswordPage, resetPasswordHandler } from "../controller/resetPassword.controller";
-import { Routes } from "../../../common/interfaces/index.interface";
-
+import { resetPasswordHandler } from "../controller/resetPassword.controller";
 
 const router = Router();
 
-router.get("/", showResetPasswordPage);
 router.post("/", resetPasswordHandler);
 
 
