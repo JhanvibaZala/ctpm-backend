@@ -1,36 +1,58 @@
 import {WorkspacesRepository} from "../repository/workspaces.repository"
-import {Iworkspace , IworkMember} from "../interfaces/workspace_obj.interface"
+import { CreateWorkspaceDto } from "../dto/workspace.dto";
+import { ICreateWorkspaceMember, IWorkspace } from "../interfaces/workspace.interface";
+import {v4 as uuidv4} from "uuid"
+import db from "../../../config/dbconfig";
 
-export class workspaceService{
+export class WorkspaceService{
     private workspaceRepo = new WorkspacesRepository;
 
-    async createWorkspace(workspace_obj:Iworkspace){
+    async createWorkspace(userId: string,workspaceObj:CreateWorkspaceDto){
+        // create connection to manage transaction
+        const connection = await db.getConnection();
         try{
-            const result = await this.workspaceRepo.insertWorkspace(workspace_obj);
-          
-            return result ;
-
-          } catch (error) {
-            console.log(error)
-            throw error;
-        }
-    }
-    async insertWorkspaceMember(workspace_id:string,user_id:string,role_id:number){
-        try{
-            const checkMember = await this.workspaceRepo.checkWorkMember(workspace_id,user_id);
-          
-            if(checkMember[0] && checkMember[0][0] && checkMember[0][0].length > 0){
-
-                return null;
-            }else{   
-
-                const result = await this.workspaceRepo.insertWorkMember(workspace_id,user_id,role_id);
-                return result
+            // start transaction 
+            await connection.beginTransaction();
+            const wsId = uuidv4();
+            const workspace: IWorkspace = {
+                id: wsId,
+                ownerId: userId,
+                workspaceName: workspaceObj.name,
+                description: workspaceObj.description,
             }
-        }catch (error) {
+            const isWsCreated = await this.workspaceRepo.insertWorkspace(connection, workspace);
+            if(!isWsCreated) {
+                return {success: false, wsId: null}
+            }
+            // get role
+            const roleData: any = await this.workspaceRepo.getRole(connection, "Workspace Admin")
+            if(roleData.length === 0) {
+                return { success: false, wsId: null }
+            }   
+
+            // add member
+            const member: ICreateWorkspaceMember = {
+                roleId: roleData[0].id,
+                userId: userId,
+                workspaceId: wsId,
+                addedBy: userId
+            }
+            const isMemberAdded = await this.workspaceRepo.insertWorkMember(connection, member);
+            if(!isMemberAdded) {
+                return {success: false, wsId: null}
+            }
+            // now commit 
+            await connection.commit()
+            return {success: true, wsId: wsId}
+            
+        } catch (error) {
             console.log(error)
+            await connection.rollback()
             throw error;
+        } finally {
+            connection.release();
         }
+    
     }
 
     // team members of ws and project

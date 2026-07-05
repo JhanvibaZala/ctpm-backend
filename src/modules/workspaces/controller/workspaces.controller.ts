@@ -1,28 +1,37 @@
 import { Response } from "express";
 import { WorkspacesRepository } from "../repository/workspaces.repository";
-import { workspaceService } from "../services/workSpace.service";
-import { Iworkspace } from "../interfaces/workspace_obj.interface";
+import { WorkspaceService } from "../services/workSpace.service";
 import { AuthRequest } from "../../../common/interfaces/AuthRequest.interface";
+import { CreateWorkspaceDto } from "../dto/workspace.dto";
 
 export async function createWorkspace(req: AuthRequest, res: Response) {
   try {
-    const user = req.user;
-    const workspace_obj = req.body as Iworkspace;
-    const workspaceSer = new workspaceService();
-    const result = await workspaceSer.createWorkspace(workspace_obj);
-    const insertId: string = result;
-    const roleId = 2;
-    const user_id = user.id;
-    const workMemberResult = await workspaceSer.insertWorkspaceMember(
-      insertId,
-      user_id,
-      roleId,
-    );
+    // user data
+    const userId = req.user.id;
+    // workspace object
+    const workspaceObj = req.body as CreateWorkspaceDto;
+    
+    // create workspace by calling service for WS
+    const workspaceSer = new WorkspaceService();
+    const result = await workspaceSer.createWorkspace(userId, workspaceObj);
+    if(!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create workspace"
+      })
+    }
 
-    res.redirect("/dashboard/workspaces");
+    return res.status(201).json({
+      success: true,
+      message: `${req.body.name} Created`,
+      workspaceId: result.wsId
+    })
   } catch (err) {
     console.log(err);
-    res.redirect("/dashboard");
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 
 }
@@ -42,29 +51,28 @@ export async function fetchWorkspaces(req: AuthRequest, res: Response) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-export async function joinWorkspace(req: AuthRequest, res: Response) {
-  try {
-    console.log("inside join controller");
-    const workspace_invite = req.body.invite_code;
-    console.log(workspace_invite);
-    const user_id = req.user.id;
-    const roleId = 4;
-    const workspaceSer = new workspaceService();
+// export async function joinWorkspace(req: AuthRequest, res: Response) {
+//   try {
+//     console.log("inside join controller");
+//     const workspace_invite = req.body.invite_code;
+//     console.log(workspace_invite);
+//     const user_id = req.user.id;
+//     const roleId = 4;
+//     const workspaceSer = new WorkspaceService();
 
-    const workMemberResult = await workspaceSer.insertWorkspaceMember(
-      workspace_invite,
-      user_id,
-      roleId,
-    );
+//     const workMemberResult = await workspaceSer.insertWorkspaceMember(
+//       workspace_invite,
+//       user_id
+//     );
 
-    res.redirect("/dashboard");
+//     res.redirect("/dashboard");
 
-  } catch (err) {
-    console.log(err);
-    res.redirect("/dashboard");
-  }
+//   } catch (err) {
+//     console.log(err);
+//     res.redirect("/dashboard");
+//   }
 
-}
+// }
 
 
 export async function deleteWorkspace(req: AuthRequest, res: Response) {
@@ -108,7 +116,7 @@ export async function getTeamMembers(req: AuthRequest, res: Response) {
       })
     }
     // call service
-    const wsService = new workspaceService();
+    const wsService = new WorkspaceService();
     const teamMembers: any = await wsService.getTeamMembers(workspaceId);
     console.log(teamMembers)
     return res.status(200).render("team/team", { wsMembers: teamMembers.wsMembers, prjMembers: teamMembers.prjMembers, workspace_id: workspaceId });
@@ -134,7 +142,7 @@ export async function getTeamMemberDetails(req: AuthRequest, res: Response) {
       return res.status(400).json({ message: "Invalid Workspace ID or username" });
     }
 
-    const wsService = new workspaceService();
+    const wsService = new WorkspaceService();
     const memberDetails = await wsService.getTeamMemberDetails(workspaceId, username);
 
     if (!memberDetails) {

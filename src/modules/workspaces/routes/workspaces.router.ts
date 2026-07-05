@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   fetchWorkspaces,
   createWorkspace,
-  joinWorkspace,
+  // joinWorkspace,
   deleteWorkspace,
   getTeamMembers,
   getTeamMemberDetails,
@@ -17,7 +17,7 @@ const router = Router({ mergeParams: true });
 // router.get("/:workspaceId/projects",checkWorkspacePermission("VIEW_PUBLIC_PROJECTS"), getProjectByworkspaceId);
 router.get("/fetchWorkspaces",checkWorkspacePermission("VIEW_CURRENT_WORKSPACE"), fetchWorkspaces);
 router.post("/createWorkspace", createWorkspace);
-router.post("/joinWorkspace", joinWorkspace);
+// router.post("/joinWorkspace", joinWorkspace);
 router.delete("/delete/:workspaceId",checkWorkspacePermission("DELETE_WORKSPACE"),deleteWorkspace)
 
 // team

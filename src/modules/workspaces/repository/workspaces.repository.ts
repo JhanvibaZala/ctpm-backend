@@ -1,7 +1,6 @@
-import { RowDataPacket } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import db from "../../../config/dbconfig";
-import { v4 as uuidv4 } from "uuid";
-import { IworkMember, Iworkspace } from "../interfaces/workspace_obj.interface"
+import { ICreateWorkspaceMember, IWorkspace } from "../interfaces/workspace.interface"
 
 export class WorkspacesRepository {
     // check if email exists in the database
@@ -10,53 +9,70 @@ export class WorkspacesRepository {
         const [rows] = await db.execute<RowDataPacket[]>(sql, [user_id]);
         return rows;
     }
-    async insertWorkspace(workspace_obj: Iworkspace) {
+
+    // get role
+    async getRole(connection: PoolConnection, roleName: string): Promise<RowDataPacket[]> {
         try {
-            const sql = "insert into workspaces (id,workspace_name,description) values (?,?,?)";
-            const insertId = uuidv4();
+            const sql = "select * from roles where role_name = ?";
+            const [result] = await connection.execute<RowDataPacket[]>(sql, [roleName]);
+            return result;
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
+    }
+
+    // creation of workspace
+    async insertWorkspace(connection: PoolConnection, workspace: IWorkspace): Promise<boolean> {
+        try {
+            const sql = `insert into workspaces (id, workspace_name, description, owner_id) values (?, ?, ?, ?)`;
             const values = [
-                insertId,
-                workspace_obj.workspace_name,
-                workspace_obj.description
-            ]
-            const result = await db.query(sql, values);
-            return insertId;
+                workspace.id,
+                workspace.workspaceName,
+                workspace.description,
+                workspace.ownerId,
+            ];
+            const [result] = await connection.query<ResultSetHeader>(sql, values);
+            return result.affectedRows > 0;
         } catch (err) {
             console.log(err);
             throw err;
 
         }
     }
-    async insertWorkMember(workspace_id: string, user_id: string, role_id: number) {
+
+    // adding memebers in workspace
+    async insertWorkMember(connection: PoolConnection, memeber: ICreateWorkspaceMember): Promise<boolean> {
         try {
-            const sql = "insert into workspace_members (workspace_id,user_id,role_id) values (?,?,?)";
-            const result = await db.query(sql, [
-                workspace_id,
-                user_id,
-                role_id
+            const sql = "insert into workspace_members (workspace_id, user_id, role_id, added_by) values (?,?,?, ?)";
+            const [result] = await connection.query<ResultSetHeader>(sql, [
+                memeber.workspaceId,
+                memeber.userId,
+                memeber.roleId,
+                memeber.addedBy
             ]);
-            return [result];
+            return result.affectedRows > 0;
         }
         catch (err) {
             console.log(err);
             throw err;
-
         }
     }
-    async checkWorkMember(workspace_id: string, user_id: string) {
-        try {
-            const result = await db.query<RowDataPacket[]>("select * from workspace_members where workspace_id = ? and user_id = ?", [
-                workspace_id, user_id
-            ]);
-            return [result];
+    // async checkWorkMember(workspace_id: string, user_id: string) {
+    //     try {
+    //         const result = await db.query<RowDataPacket[]>("select * from workspace_members where workspace_id = ? and user_id = ?", [
+    //             workspace_id, user_id
+    //         ]);
+    //         return [result];
 
-        }
-        catch (err) {
-            console.log(err);
-            throw err;
+    //     }
+    //     catch (err) {
+    //         console.log(err);
+    //         throw err;
 
-        }
-    }
+    //     }
+    // }
 
     async selectUsersByWorkspaceId(workspace_id: string) {
         try {
