@@ -9,6 +9,7 @@ import projectStatusSync from "../middlewares/projectSync.middleware";
 import loginRouter from "../modules/auth/routes/login.router";
 import forgotPasswordRouter from "../modules/auth/routes/forgotPassword.router";
 import otpRouter from "../modules/auth/routes/otp.router";
+import userRouter from "../modules/user/routes/user.router";
 import resetPasswordRouter from "../modules/auth/routes/resetPassword.router";
 import taskRouter from "../modules/tasks/routes/tasks.router";
 import { createCommentRouter } from "../modules/tasks/routes/comments.routes";
@@ -75,6 +76,12 @@ export function createMasterRouter(
     authMiddleware,
     workspacesRouter,
   ); // add middleware here later to protect this route
+
+
+  // gets current logged in user
+  router.use("/api/me", authMiddleware, userRouter);
+
+
   router.use(
     "/api/workspaces/:workspaceId/projects",
     authMiddleware,

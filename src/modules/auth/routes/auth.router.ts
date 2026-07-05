@@ -2,7 +2,6 @@
 import { Router } from 'express';
 import passport from '../../../config/passport';
 import { refreshController } from '../controller/refreshTokens.controller';
-import { login_user, showLoginPage } from '../controller/login.controller';
 import authMiddleware from '../../../middlewares/auth.middleware';
 
 const router = Router();
@@ -33,6 +32,6 @@ router.get(
 
 // ── Token management ───────────────────────────────────────
 router.post('/refresh', refreshController.refreshToken);
-router.get('/logout', authMiddleware, refreshController.logout);
+router.post('/logout', authMiddleware, refreshController.logout);
 
 export default router;
