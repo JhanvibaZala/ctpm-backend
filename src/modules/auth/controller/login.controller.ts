@@ -81,14 +81,16 @@ export const loginUser = async (req: Request, res: Response) => {
           maxAge: refreshCookieAge, // 7 days
         });
 
-
+        console.log(user)
         return res.status(200).json({
             success: true,
             message: "Login successfully",
             user: {
                 id: user.id,
-                email: user.email,
-                username: user.username
+                email: user.email_id,
+                username: user.username,
+                firstName: user.first_name,
+                lastName: user.last_name,
             }
         })
 
