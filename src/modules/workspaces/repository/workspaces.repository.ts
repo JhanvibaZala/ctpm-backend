@@ -124,7 +124,7 @@ export class WorkspacesRepository {
     try {
       const sql = `select * from workspace_invite_codes where invite_code = ?`;
       const [result] = await db.execute<RowDataPacket[]>(sql, [inviteCode]);
-      if (result.length === 0) {
+      if (result.length === 0 || typeof result == undefined) {
         return null;
       }
       return inviteCodeMapper(result[0]);
