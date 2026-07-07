@@ -24,7 +24,7 @@ export async function createWorkspace(req: AuthRequest, res: Response) {
     return res.status(201).json({
       success: true,
       message: `${req.body.name} Created`,
-      workspaceId: result.wsId
+      // workspaceId: result.wsId
     })
   } catch (err) {
     console.log(err);
@@ -38,41 +38,86 @@ export async function createWorkspace(req: AuthRequest, res: Response) {
 
 export async function fetchWorkspaces(req: AuthRequest, res: Response) {
   try {
-    const workspaceRepository = new WorkspacesRepository();
+    const userId = req.user.id
+    const workspaceService = new WorkspaceService();
 
-    const workspaces = await workspaceRepository.fetch_user_workspaces(
-      req.user.id
-    );
-
-
-    res.json(workspaces);
+    const workspaces = await workspaceService.fetchAllUserWorkspaces(userId);
+    console.log(workspaces)
+    return res.status(200).json({
+      success: true,
+      message: "Fetched all the workspaces",
+      data: workspaces
+    });
   } catch (err) {
     console.error("Error fetching workspaces:", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
   }
 }
-// export async function joinWorkspace(req: AuthRequest, res: Response) {
-//   try {
-//     console.log("inside join controller");
-//     const workspace_invite = req.body.invite_code;
-//     console.log(workspace_invite);
-//     const user_id = req.user.id;
-//     const roleId = 4;
-//     const workspaceSer = new WorkspaceService();
 
-//     const workMemberResult = await workspaceSer.insertWorkspaceMember(
-//       workspace_invite,
-//       user_id
-//     );
+export async function handleGenerateInviteCode(req:AuthRequest, res:Response) {
+  try {
+    const { workspaceId } = req.params;
+    if(typeof workspaceId != "string" || workspaceId == undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid workspace ID"
+      })
+    }
+    const userId = req.user.id;
+    const workspaceService = new WorkspaceService();
+    const isInviteCodeGenerated = await workspaceService.generateInviteCode(workspaceId, userId);
+    if(!isInviteCodeGenerated.success || isInviteCodeGenerated.inviteCode == null) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to generate invite code",
+      })
+    }
+    return res.status(201).json({
+      success: true,
+      message: "Invite code generated",
+      inviteCode: isInviteCodeGenerated.inviteCode
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    })
+  }
+}
 
-//     res.redirect("/dashboard");
+export async function joinWorkspace(req: AuthRequest, res: Response) {
+  try {
+    const { inviteCode } = req.body;
+    const userId = req.user.id;
+    
+    const workspaceService = new WorkspaceService();
+    await workspaceService.addWorkspaceMemberViaCode(userId, inviteCode);
+    
 
-//   } catch (err) {
-//     console.log(err);
-//     res.redirect("/dashboard");
-//   }
+    return res.status(200).json({
+      success: true,
+      message: "Joined Workspace successfully!",
+    })
 
-// }
+  } catch (err) {
+    console.error(err);
+    if(err instanceof Error) {
+      return res.status(400).json({
+        success: false,
+        message: err.message,
+      })
+    }
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    })
+  }
+
+}
 
 
 export async function deleteWorkspace(req: AuthRequest, res: Response) {

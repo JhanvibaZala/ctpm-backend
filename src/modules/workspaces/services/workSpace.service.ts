@@ -3,6 +3,8 @@ import { CreateWorkspaceDto } from "../dto/workspace.dto";
 import { ICreateWorkspaceMember, IWorkspace } from "../interfaces/workspace.interface";
 import {v4 as uuidv4} from "uuid"
 import db from "../../../config/dbconfig";
+import crypto from "crypto"
+import { CreateInviteCode, InviteCode } from "../interfaces/inviteCode.interface";
 
 export class WorkspaceService{
     private workspaceRepo = new WorkspacesRepository;
@@ -42,7 +44,8 @@ export class WorkspaceService{
                 return {success: false, wsId: null}
             }
             // now commit 
-            await connection.commit()
+            await connection.commit();
+            
             return {success: true, wsId: wsId}
             
         } catch (error) {
@@ -53,6 +56,108 @@ export class WorkspaceService{
             connection.release();
         }
     
+    }
+
+    // generate invite code 
+    async generateInviteCode(workspaceId: string, userId: string) {
+        try {
+
+            // check is the code already exist for that workspace
+            const isThereActiveInviteCode = await this.workspaceRepo.findActiveInviteCode(workspaceId);
+            if(isThereActiveInviteCode.length > 0) {
+                const existingInviteCode = isThereActiveInviteCode[0].invite_code;
+                return {
+                    success: true,
+                    inviteCode: existingInviteCode 
+                }
+            }
+            
+            const inviteCode =
+            crypto.randomBytes(3).toString("hex").toUpperCase()
+            +
+            "-"
+            +
+            crypto.randomBytes(2).toString("hex").toUpperCase();
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7);     // expires in 7 days
+            const inviteCodeObj: CreateInviteCode = {
+                id: uuidv4(),
+                workspaceId: workspaceId,
+                createdBy: userId,
+                expiresAt: expiresAt,
+                inviteCode: inviteCode,
+                maxUses: 20,
+            } 
+            const isInviteCodeAdded = await this.workspaceRepo.insertInviteCode(inviteCodeObj);
+            if(!isInviteCodeAdded) {
+                return {success: false, inviteCode: null}
+            }
+            return {
+                success: true,
+                inviteCode: inviteCode,
+            }
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    // join workspace members
+    async addWorkspaceMemberViaCode(userId: string, inviteCode: string) {
+        const invite = await this.workspaceRepo.getInviteCodeViaWorkspace(inviteCode);
+        if (!invite) {
+            throw new Error("Invalid invite code.");
+        }
+
+        // 2. Active?
+        if (!invite.isActive) {
+            throw new Error("Invite code is inactive.");
+        }
+
+        // 3. Expired?
+        if (new Date(invite.expiresAt) < new Date()) {
+            throw new Error("Invite code has expired.");
+        }
+
+        // 4. Usage limit
+        if (invite.usedCount >= invite.maxUses) {
+            throw new Error("Invite code has reached its maximum usage.");
+        }
+
+        // 5. Already joined?
+        const member =
+            await this.workspaceRepo.getWorkspaceMember(
+                invite.workspaceId,
+                userId
+            )
+
+        if (member) {
+            throw new Error("You are already a member of this workspace.");
+        }
+
+        // 6. Add member
+        const MEMBER_ROLE_ID = 4;
+        await this.workspaceRepo.addWorkspaceMember({
+            workspaceId: invite.workspaceId,
+            userId,
+            roleId: MEMBER_ROLE_ID,
+            addedBy: invite.createdBy
+        });
+
+        // 7. Increase used count
+        await this.workspaceRepo.incrementInviteUsage(invite.id);
+        
+    }
+
+    // get all workspaces that user is a part of
+    async fetchAllUserWorkspaces(userId: string) {
+        try {
+            const workspaces = await this.workspaceRepo.fetchUserWorkspaces(userId);
+            return workspaces;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
     }
 
     // team members of ws and project

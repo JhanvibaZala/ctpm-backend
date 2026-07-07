@@ -12,4 +12,25 @@ export interface ICreateWorkspaceMember{
     addedBy: string;
 }
 
+export interface Workspace {
+    id: string;
+    name: string;
+    description: string | null;
+    ownerId: string;
+    createdAt: Date;
+    totalMembers: number;
+
+    member: {
+        roleId: number;
+        joinedAt: Date;
+        addedBy: string;
+    };
+}
           
+export interface AddWorkspaceMember {
+    workspaceId: string;
+    userId: string;
+    roleId: number;
+    addedBy: string;
+
+}
