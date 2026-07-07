@@ -1,3 +1,5 @@
+import { RowDataPacket } from "mysql2";
+
 export interface IWorkspace {
     id: string;
     workspaceName: string;
@@ -33,4 +35,15 @@ export interface AddWorkspaceMember {
     roleId: number;
     addedBy: string;
 
+}
+
+export interface WorkspaceDetails {
+    id: string;
+    workspaceName: string;
+    description: string;
+    role: string;
+    totalMembers: number;
+    totalProjects: number;
+    totalTasks: number;
+    createdAt: string;
 }

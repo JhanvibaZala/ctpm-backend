@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import { Workspace } from "../interfaces/workspace.interface";
+import { Workspace, WorkspaceDetails } from "../interfaces/workspace.interface";
 import { InviteCode } from "../interfaces/inviteCode.interface";
 
 export const workspaceMapper = (
@@ -19,6 +19,21 @@ export const workspaceMapper = (
             joinedAt: row.joined_at,
             addedBy: row.added_by,
         },
+    };
+};
+export const workspaceDetailsMapper = (
+    row: RowDataPacket
+): WorkspaceDetails => {
+
+    return {
+        id: row.id,
+        workspaceName: row.workspace_name,
+        description: row.description,
+        createdAt: row.created_at,
+        role: row.role,
+        totalMembers: row.totalMembers,
+        totalProjects: row.totalProjects,
+        totalTasks: row.totalTasks,
     };
 };
 

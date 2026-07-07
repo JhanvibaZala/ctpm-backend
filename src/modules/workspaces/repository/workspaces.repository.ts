@@ -4,8 +4,9 @@ import {
     AddWorkspaceMember,
   ICreateWorkspaceMember,
   IWorkspace,
+  WorkspaceDetails,
 } from "../interfaces/workspace.interface";
-import { inviteCodeMapper, workspaceMapper } from "../mappers/workspace.mapper";
+import { inviteCodeMapper, workspaceDetailsMapper, workspaceMapper } from "../mappers/workspace.mapper";
 import {
   CreateInviteCode,
   InviteCode,
@@ -171,16 +172,55 @@ export class WorkspacesRepository {
     ]);
   }
 
-    // update the user count in invite codes of WS
-    async incrementInviteUsage(inviteId: string) {
-        const sql = `
-            UPDATE workspace_invite_codes
-            SET used_count = used_count + 1
-            WHERE id = ?
-        `;
+  // update the user count in invite codes of WS
+  async incrementInviteUsage(inviteId: string) {
+      const sql = `
+          UPDATE workspace_invite_codes
+          SET used_count = used_count + 1
+          WHERE id = ?
+      `;
 
-        await db.execute(sql, [inviteId]);
-    } 
+      await db.execute(sql, [inviteId]);
+  } 
+
+  // fetches the data for single workspace
+  async fetchWorkspaceDetailsViaId(workspaceId: string, userId: string) {
+    try {
+      console.log("sdfaksfdbsdf")
+      const sql =`
+        SELECT w.id, w.workspace_name, w.description, w.created_at, r.role_name AS role,
+          (SELECT COUNT(*) FROM workspace_members WHERE workspace_id = w.id) AS totalMembers,
+          COUNT(DISTINCT p.id) AS totalProjects,
+          COUNT(DISTINCT t.id) AS totalTasks
+        FROM workspaces w
+        JOIN workspace_members wm
+          ON wm.workspace_id = w.id
+        JOIN roles r
+          ON r.id = wm.role_id
+        LEFT JOIN projects p
+          ON p.workspace_id = w.id
+        LEFT JOIN project_tasks t
+          ON t.project_id = p.id
+        WHERE
+          w.id = ?
+          AND wm.user_id = ?
+        GROUP BY
+          w.id,
+          w.workspace_name,
+          w.description,
+          w.created_at,
+          r.role_name;
+      `
+      const [result] = await db.execute<RowDataPacket[]>(sql, [workspaceId, userId]);
+      if (result.length === 0) {
+        return null;
+      }
+      return workspaceDetailsMapper(result[0]);
+      
+    } catch (error) {
+      throw error;
+    }  
+  } 
 
   async selectUsersByWorkspaceId(workspace_id: string) {
     try {

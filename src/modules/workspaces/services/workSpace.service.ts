@@ -160,6 +160,30 @@ export class WorkspaceService{
         }
     }
 
+    // get workspace details
+    async fetchWorkspaceDetails(workspaceId: string, userId: string) {
+        try {
+            console.log("asdhsdb")
+            console.log(userId)
+            const workspace = await this.workspaceRepo.fetchWorkspaceDetailsViaId(workspaceId, userId);
+
+            if (!workspace) {
+                return {
+                    success: false,
+                    message: "Workspace not found",
+                };
+            }
+            console.log(workspace)
+
+            return {
+                success: true,
+                data: workspace,
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // team members of ws and project
     async getTeamMembers(workspaceId: string) {
         try {

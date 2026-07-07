@@ -119,6 +119,39 @@ export async function joinWorkspace(req: AuthRequest, res: Response) {
 
 }
 
+export async function fetchWorkspaceDetails(req:AuthRequest, res: Response) {
+  console.log(" HEloohvgvgh")
+  try {
+    const {workspaceId} = req.params;
+    const userId = req.user.id;
+
+    if(typeof workspaceId != "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid workspace Id"
+      })
+    }
+    const wsService = new WorkspaceService();
+    const workspace = await wsService.fetchWorkspaceDetails(workspaceId, userId);
+    if(!workspace.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch workspace details"
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Fetch Data",
+      data: workspace.data,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    })
+  }
+}
+
 
 export async function deleteWorkspace(req: AuthRequest, res: Response) {
   try {

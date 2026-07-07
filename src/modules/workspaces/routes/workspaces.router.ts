@@ -7,6 +7,7 @@ import {
   // getTeamMembers,
   // getTeamMemberDetails,
   handleGenerateInviteCode,
+  fetchWorkspaceDetails,
 } from "../controller/workspaces.controller";
 // import { showDashboard } from "../../dashboard/controller/dashboard.controller";
 // import { getProjectByworkspaceId } from "../../projects/controller/project.controller";
@@ -19,6 +20,7 @@ const router = Router({ mergeParams: true });
 router.post("/join-workspace", joinWorkspace);
 router.get("/", fetchWorkspaces);
 router.post("/", createWorkspace);
+router.get("/:workspaceId", fetchWorkspaceDetails)
 
 // invite members
 router.post("/:workspaceId/invite", handleGenerateInviteCode);
