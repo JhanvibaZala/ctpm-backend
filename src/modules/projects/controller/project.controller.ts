@@ -14,6 +14,7 @@ import { CreateProjectDto } from "../dto/createProject.dto";
 // create project
 export async function createProject(req: AuthRequest, res: Response) {
   try {
+    console.log(req.body)
     const dto = req.body as CreateProjectDto;
     const service = new ProjectService();
     const { workspaceId } = req.params;
@@ -102,6 +103,92 @@ export async function getAllProjects(req: AuthRequest, res: Response) {
   }
 }
 
+// get project details
+export async function getProjectDetails(
+  req: AuthRequest,
+  res: Response
+) {
+  try {
+    const { workspaceId, projectId } = req.params;
+    if (typeof workspaceId != "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid workspace ID"
+      })
+    }
+    if (typeof projectId != "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid project ID"
+      })
+    }
+
+    const service = new ProjectService();
+
+    const project = await service.getProjectDetails(
+      workspaceId,
+      projectId
+    );
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: project,
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+// delete project controller
+export async function handleDeleteProject(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.user.id;
+    const {projectId} = req.params;
+    console.log(userId, projectId);
+    if (typeof projectId != "string")
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Invalid project ID"
+        });
+
+    const service = new ProjectService();
+    const isDeleted = await service.deleteProject(projectId);
+    if(!isDeleted.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to delete project"
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Deleted successfully"
+    })
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({ msg: "something went wrong project is not deleted" });
+  }
+}
+
+
+// NOT MINE =>
+
 export async function getUserByProjectId(req: AuthRequest, res: Response) {
   try {
     const projectSer = new ProjectService();
@@ -131,46 +218,6 @@ export async function getProjectByUserId(req: AuthRequest, res: Response) {
   } catch (err) {
     console.log(err);
     res.redirect("/dashboard");
-  }
-}
-
-
-
-// delete project controller
-
-export async function deleteProject(req: AuthRequest, res: Response) {
-  try {
-    const user_id = req.user.id;
-    const project_id = req.params.projectId?.toLocaleString();
-    console.log(user_id, project_id);
-    if (!user_id || !project_id)
-      return res
-        .status(401)
-        .json({ msg: "something went wrong user data not provided" });
-
-    const projectRepo = new projectRepository();
-    const projectServ = new ProjectService();
-
-    // if(userRole?.role_name != "Project Manager" || userRole?.role_name != "Workspace Admin") return res.send("according to your role you are not eligible to delete project")
-    const isValidRole = await projectServ.checkUserRoleForProject(
-      user_id,
-      project_id,
-      ["Project Manage", "Workspace Admin"],
-    );
-    if (isValidRole) {
-      const result = await projectRepo.deleteProjectByProjectId(project_id);
-    } else {
-      return res
-        .status(400)
-        .json({ msg: "your role is not eligible to delete project" });
-    }
-
-    return res.status(200).json({ msg: "successfully delete" });
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(500)
-      .json({ msg: "something went wrong project is not deleted" });
   }
 }
 

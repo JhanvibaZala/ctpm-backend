@@ -132,14 +132,97 @@ export class projectRepository {
     const sql = `
       SELECT * 
       FROM projects 
-      WHERE workspace_id = ?;
+      WHERE workspace_id = ?
+      ORDER BY created_at desc;
     `
     const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId]);
     return rows;
   }
 
-
+  // get project details 
+  async fetchProject(workspaceId: string, projectId: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT
+        p.id,
+        p.workspace_id,
+        p.project_name,
+        p.description,
+        p.priority_level,
+        p.status,
+        p.visibility,
+        p.created_at,
+        p.deadline_at,
+        p.completed_at,
+        p.updated_at
+    FROM projects p
+    WHERE
+        p.workspace_id = ?
+        AND p.id = ?;
+    `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId, projectId]);
+    return rows;
+  }
   
+  // get project members from project id
+  async fetchProjectMembers(projectId: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.username,
+        u.email_id,
+        u.profile_pic_path,
+        pm.joined_at,
+        r.id AS role_id,
+        r.role_name
+      FROM project_members pm
+      INNER JOIN users u
+        ON pm.user_id = u.id
+      INNER JOIN roles r
+        ON pm.role_id = r.id
+      WHERE
+        pm.project_id = ?
+      ORDER BY
+        r.id,
+        u.first_name;
+      `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [projectId]);
+    return rows;
+  }
+
+  // allowed statuses
+  async fetchAllowedStatuses(projectId: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT
+        id,
+        status_text,
+        status_level
+      FROM allowed_task_statuses
+      WHERE project_id = ?
+      ORDER BY status_level;
+    `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [projectId]);
+    return rows;
+  }
+
+  // delete project stuff
+  async deleteProjectMembers(connection: PoolConnection, projectId : string){
+    const sql = "delete from project_members where project_id = ?"
+    await connection.execute(sql,[projectId])
+  }
+  
+  async deleteAllowedTaskStatuses(connection: PoolConnection, projectId : string){
+    const sql = "delete from allowed_task_statuses where project_id = ?"
+    await connection.execute(sql,[projectId])
+  }
+
+  async deleteProjectByProjectId(connection: PoolConnection, projectId: string): Promise<boolean> {
+    const sql = "DELETE FROM projects WHERE id = ?";
+    const [result] = await connection.execute<ResultSetHeader>(sql, [projectId]);
+    return result.affectedRows > 0;
+  }
+
   async selectProjectByuserId(user_id: string) {
     try {
       const sql =
@@ -218,15 +301,7 @@ export class projectRepository {
     }
   }
 
-  async deleteProjectByProjectId(project_id: string) {
-    try {
-      const sql = "delete from projects where id=?";
-      const [result] = await db.execute(sql, [project_id]);
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  }
+  
 
   async updateProjectByProjectId(project_obj: Iproject) {
     try {
@@ -260,25 +335,5 @@ export class projectRepository {
     }
   }
 
-  async deleteProjectMembers(project_id : string){
-    try{
-      const sql = "delete from project_members where project_id = ?"
-      const [result] = await db.execute(sql,[project_id])
-      return result;
-    }catch(err){
-      console.log("failed to delete project members")
-      throw err
-    }
-  }
-
-  async deleteAllowedTaskStatuses(project_id : string){
-    try{
-      const sql = "delete from allowed_task_statuses where project_id = ?"
-      const [result] = await db.execute(sql,[project_id])
-      return result;
-    }catch(err){
-      console.log("failed to delete allowed task statuses")
-      throw err
-    }
-  }
+  
 }
