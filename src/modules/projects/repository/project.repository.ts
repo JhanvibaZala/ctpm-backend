@@ -1,47 +1,134 @@
-import { QueryResult, RowDataPacket } from "mysql2/promise";
+import { PoolConnection, QueryResult, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import db from "../../../config/dbconfig";
 import { Iproject, IprojectMEmber } from "../interfaces/project_obj.interface";
 import { success } from "zod";
+import { IProject } from "../interfaces/createProject.interface";
 
 export class projectRepository {
-  async insertProject(project_obj: Iproject) {
-    try {
-      const sql =
-        "insert into projects (id,workspace_id,project_name,description,priority_level,status,visibility,deadline_at) values (?,?,?,?,?,?,?,?)";
-      console.log("project insert module : ", project_obj);
-      const values = [
-        project_obj.project_id,
-        project_obj.workspace_id,
-        project_obj.project_name,
-        project_obj.description,
-        project_obj.priority_level,
-        project_obj.status,
-        project_obj.visibility,
-        project_obj.deadline_at,
-      ];
-      const result = await db.query(sql, values);
-      console.log("insert project successfully");
-      return success;
-    } catch (err) {
-      console.log("failed to insert project", err);
-      throw err;
-    }
+  async insertProject(connection: PoolConnection, project: IProject): Promise<boolean> {
+    const sql = `
+      INSERT INTO projects
+      (
+          id,
+          workspace_id,
+          project_name,
+          description,
+          priority_level,
+          status,
+          visibility,
+          deadline_at
+      )
+      VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+    const values = [
+      project.id,
+      project.workspaceId,
+      project.projectName,
+      project.description ?? null,
+      project.priorityLevel,
+      "Pending",
+      project.visibility,
+      project.deadlineAt ?? null
+    ];
+
+    const [result] = await connection.query<ResultSetHeader>(sql, values);
+    return result.affectedRows > 0;
   }
-  async insertProjectMember(projectmember_obj: IprojectMEmber) {
-    try {
-      const sql =
-        "insert into project_members(project_id,user_id,role_id) values (?,?,?)";
-      const values = [
-        projectmember_obj.project_id,
-        projectmember_obj.user_id,
-        projectmember_obj.role_id,
-      ];
-      const result = await db.query(sql, values);
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
+
+  async insertProjectMember(
+    connection: PoolConnection,
+    projectId: string,
+    userId: string,
+    roleId: number
+  ) {
+
+    const sql = `
+    INSERT INTO project_members
+    (
+        project_id,
+        user_id,
+        role_id
+    )
+    VALUES (?, ?, ?)
+    `;
+
+    await connection.execute(sql, [
+        projectId,
+        userId,
+        roleId
+    ]);
   }
+
+  // INSERT ALLOWED STATUES IN TASKS
+  async insertAllowedStatus(
+    connection: PoolConnection,
+    projectId: string,
+    text: string,
+    level: number
+  ) {
+
+    const sql = `
+    INSERT INTO allowed_task_statuses
+    (
+        project_id,
+        status_text,
+        status_level
+    )
+    VALUES (?, ?, ?)
+    `;
+
+    await connection.execute(sql, [
+        projectId,
+        text,
+        level
+    ]);
+  }
+  async isWorkspaceMember(
+    connection: PoolConnection,
+    workspaceId: string,
+    userId: string
+  ): Promise<boolean> {
+
+    const sql = `
+    SELECT *
+    FROM workspace_members
+    WHERE workspace_id=?
+    AND user_id=?
+    `;
+
+    const [rows] = await connection.execute<RowDataPacket[]>(sql, [
+          workspaceId,
+          userId
+    ]);
+
+    return rows.length > 0;
+  }
+
+  async fetchWorkspaceMembers(
+    workspaceId: string
+  ) {
+    const sql = `
+    SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email_id
+    FROM workspace_members wm
+    INNER JOIN users u
+        ON wm.user_id=u.id
+    WHERE wm.workspace_id=?
+    `;
+    const [rows] =
+      await db.execute<RowDataPacket[]>(sql, [
+          workspaceId
+      ]);
+    return rows;
+  }
+
+
+  
   async selectProjectByuserId(user_id: string) {
     try {
       const sql =
