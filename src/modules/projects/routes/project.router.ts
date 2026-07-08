@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {createProject, deleteProject, fetchMembersInWorkspace, getProjectByworkspaceId, getProjectForEdit, updateProject} from "../controller/project.controller";
+import {createProject, deleteProject, fetchMembersInWorkspace, getAllProjects,  getProjectForEdit, updateProject} from "../controller/project.controller";
 import { getInviteTeamMember } from "../controller/teamMember.controller";
 import authMiddleware from "../../../middlewares/auth.middleware";
 import checkWorkspacePermission from "../../../middlewares/workspacePermCheck.middleware";
@@ -8,6 +8,7 @@ const router = Router({ mergeParams: true });
 
 
 router.post("/", createProject);
+router.get("/", getAllProjects)
 router.get("/members", fetchMembersInWorkspace)
 
 router.get("/getinvitemember",getInviteTeamMember)

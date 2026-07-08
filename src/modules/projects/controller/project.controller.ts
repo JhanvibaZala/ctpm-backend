@@ -11,12 +11,13 @@ import { insertProjectAllowedTasksStatus } from "../repository/project.task.repo
 import { AuthRequest } from "../../../common/interfaces/AuthRequest.interface";
 import { CreateProjectDto } from "../dto/createProject.dto";
 
+// create project
 export async function createProject(req: AuthRequest, res: Response) {
   try {
     const dto = req.body as CreateProjectDto;
     const service = new ProjectService();
-    const {workspaceId} = req.params;
-    if(typeof workspaceId != "string" ) {
+    const { workspaceId } = req.params;
+    if (typeof workspaceId != "string") {
       return res.status(400).json({
         success: false,
         message: "Invalid workspace ID"
@@ -49,11 +50,11 @@ export async function createProject(req: AuthRequest, res: Response) {
     });
   }
 }
-
-export async function fetchMembersInWorkspace(req:AuthRequest, res:Response) {
+// get members for create modal
+export async function fetchMembersInWorkspace(req: AuthRequest, res: Response) {
   try {
-    const {workspaceId} = req.params;
-    if(typeof workspaceId != "string" ) {
+    const { workspaceId } = req.params;
+    if (typeof workspaceId != "string") {
       return res.status(400).json({
         success: false,
         message: "Invalid workspace ID"
@@ -64,6 +65,32 @@ export async function fetchMembersInWorkspace(req:AuthRequest, res:Response) {
     return res.status(201).json({
       success: true,
       message: "Members fetched successfully",
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+// get all projects via workspace id 
+export async function getAllProjects(req: AuthRequest, res: Response) {
+  try {
+    const { workspaceId } = req.params;
+    if (typeof workspaceId != "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid workspace ID"
+      })
+    }
+    const service = new ProjectService();
+    const result = await service.fetchAllProjectsInWorkspace(workspaceId);
+    return res.status(200).json({
+      success: true,
+      message: "Projects fetched successfully",
       data: result,
     });
   } catch (error) {
@@ -107,22 +134,7 @@ export async function getProjectByUserId(req: AuthRequest, res: Response) {
   }
 }
 
-// this controller show project list page
-export async function getProjectByworkspaceId(req: AuthRequest, res: Response) {
-  try {
-    const projectSer = new ProjectService();
 
-    const workspace_id: string = req.params.workspaceId as string;
-
-    const projectRepo = new projectRepository();
-    const projects = await projectRepo.selectProjectByworkspaceId(workspace_id);
-    console.log(projects);
-    res.render("dashboard/projects_list", { projects, workspace_id });
-  } catch (err) {
-    console.log(err);
-    res.redirect("/dashboard");
-  }
-}
 
 // delete project controller
 

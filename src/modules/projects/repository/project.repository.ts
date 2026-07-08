@@ -2,10 +2,10 @@ import { PoolConnection, QueryResult, ResultSetHeader, RowDataPacket } from "mys
 import db from "../../../config/dbconfig";
 import { Iproject, IprojectMEmber } from "../interfaces/project_obj.interface";
 import { success } from "zod";
-import { IProject } from "../interfaces/createProject.interface";
+import { ICreateProject } from "../interfaces/createProject.interface";
 
 export class projectRepository {
-  async insertProject(connection: PoolConnection, project: IProject): Promise<boolean> {
+  async insertProject(connection: PoolConnection, project: ICreateProject): Promise<boolean> {
     const sql = `
       INSERT INTO projects
       (
@@ -99,8 +99,8 @@ export class projectRepository {
     `;
 
     const [rows] = await connection.execute<RowDataPacket[]>(sql, [
-          workspaceId,
-          userId
+      workspaceId,
+      userId
     ]);
 
     return rows.length > 0;
@@ -124,6 +124,17 @@ export class projectRepository {
       await db.execute<RowDataPacket[]>(sql, [
           workspaceId
       ]);
+    return rows;
+  }
+
+  // gets all the projects in the workspace
+  async fetchAllProjectsInWorkspace(workspaceId: string): Promise<RowDataPacket[]> {
+    const sql = `
+      SELECT * 
+      FROM projects 
+      WHERE workspace_id = ?;
+    `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId]);
     return rows;
   }
 

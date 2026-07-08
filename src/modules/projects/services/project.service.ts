@@ -3,9 +3,10 @@ import { Iproject, IprojectMEmber } from "../interfaces/project_obj.interface";
 import { projectRepository } from "../repository/project.repository";
 import { expectFailure } from "node:test";
 import { CreateProjectDto } from "../dto/createProject.dto";
-import { IProject } from "../interfaces/createProject.interface";
+import { ICreateProject } from "../interfaces/createProject.interface";
 import {v4 as uuidv4} from "uuid"
 import db from "../../../config/dbconfig";
+import { mapProjects } from "../mapper/project.mapper";
 
 export class ProjectService {
   private projectRepo = new projectRepository();
@@ -20,7 +21,7 @@ export class ProjectService {
       
       await connection.beginTransaction();
       const projectId = uuidv4();
-      const project: IProject = {
+      const project: ICreateProject = {
         id: projectId,
         workspaceId,
         projectName: dto.name,
@@ -139,6 +140,15 @@ export class ProjectService {
     try {
       const result = this.projectRepo.fetchWorkspaceMembers(workspaceId);
       return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async fetchAllProjectsInWorkspace(workspaceId: string) {
+    try {
+      const result = await this.projectRepo.fetchAllProjectsInWorkspace(workspaceId);
+      return mapProjects(result);
     } catch (error) {
       throw error;
     }

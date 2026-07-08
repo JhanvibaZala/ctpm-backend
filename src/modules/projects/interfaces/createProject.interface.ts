@@ -1,4 +1,4 @@
-export interface IProject {
+export interface ICreateProject {
     id?: string;
     workspaceId: string;
     projectName: string;
