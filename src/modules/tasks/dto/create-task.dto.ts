@@ -7,5 +7,5 @@ export interface CreateTaskDto {
     estimatedHours: string;
     startDate: Date;
     dueAt: Date;
-    completedAt: Date;
+    completedAt: Date | null;
 }

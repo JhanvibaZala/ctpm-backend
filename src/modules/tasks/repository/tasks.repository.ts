@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { ICreateTasks, IUpdateTasks } from "../interfaces/tasks.interface";
 import db from "../../../config/dbconfig";
 import { ICreateAttachments, IDeleteAttachments } from "../interfaces/attachments.interface";
@@ -23,13 +23,13 @@ export class TasksRepository {
     }
 
     // creates a task in DB 
-    async createTask(task: ICreateTasks): Promise<boolean> {
+    async createTask(connection: PoolConnection, task: ICreateTasks): Promise<boolean> {
         try {
             const sql = `insert into project_tasks(id, project_id, depends_on_task_id, task_name, description, status_id, priority_level, estimated_hours, start_date, due_at, completed_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
             const values = [
                 task.id, 
                 task.projectId, 
-                task.dependsOnTaskId ?? null, 
+                task.dependsOnTaskId == "" ? null: task.dependsOnTaskId, 
                 task.taskName, 
                 task.description ?? null, 
                 task.statusId, 
@@ -39,7 +39,7 @@ export class TasksRepository {
                 task.dueAt ?? null, 
                 task.completedAt ?? null
             ];
-            const [result] = await db.execute<ResultSetHeader>(sql, values);
+            const [result] = await connection.query<ResultSetHeader>(sql, values);
             return result.affectedRows > 0;
         } catch (error) {
             console.error("failed to create task");
@@ -48,7 +48,7 @@ export class TasksRepository {
     }
 
     // create attachements in DB
-    async createAttachment(files: ICreateAttachments[]): Promise<boolean> {
+    async createAttachment(connection: PoolConnection, files: ICreateAttachments[]): Promise<boolean> {
         try {
             const sql = `insert into task_files(id, task_id, uploaded_by, file_name, file_path, file_size, mime_type) values ?;`
             const values = files.map(file => [
@@ -60,7 +60,7 @@ export class TasksRepository {
                 file.fileSize,
                 file.mimeType
             ]); 
-            const [result] = await db.query<ResultSetHeader>(sql, [values]);
+            const [result] = await connection.query<ResultSetHeader>(sql, [values]);
             return result.affectedRows > 0;
         } catch (error) {
             console.error("failed to add file in DB!");
@@ -69,7 +69,7 @@ export class TasksRepository {
     } 
 
     // create assignee in DB
-    async createAssignee(taskId: string, assignees: string[]): Promise<boolean> {
+    async createAssignee(connection: PoolConnection, taskId: string, assignees: string[]): Promise<boolean> {
         try {
             if(assignees.length == 0) {
                 return true;
@@ -82,7 +82,7 @@ export class TasksRepository {
             const values = assignees.map(userId => [
                 taskId, userId
             ])
-            const [result] = await db.query<ResultSetHeader>(sql, [values]);
+            const [result] = await connection.query<ResultSetHeader>(sql, [values]);
             return result.affectedRows > 0;
         } catch (error) {
             console.error("failed to add file in DB!");
@@ -104,10 +104,10 @@ export class TasksRepository {
     // subtask
 
     // get status id from status table using project ID
-    async getStatusId (projectId: string): Promise<RowDataPacket[]> {
+    async getStatusId (connection: PoolConnection, projectId: string): Promise<RowDataPacket[]> {
         try {
             const sql = `select id from allowed_task_statuses where project_id = ? order by created_at desc limit 1;`
-            const [result] = await db.execute<RowDataPacket[]>(sql, [projectId]);
+            const [result] = await connection.execute<RowDataPacket[]>(sql, [projectId]);
             return result;
         } catch (error) {
             console.error("failed to retrieve status!");
@@ -182,16 +182,16 @@ export class TasksRepository {
         }
     } 
     // get status details
-    async getTasks (projectId: string) {
+    async getTasks (projectId: string):Promise<RowDataPacket[]> {
         try {
             const sql = `
-                select t.*, s.status_text from project_tasks t 
+                select t.id, t.task_name, t.priority_level, t.estimated_hours, t.created_at, t.start_date, t.completed_at, t.due_at, s.status_text from project_tasks t 
                 join allowed_task_statuses s 
                 on t.status_id = s.id
                 where t.project_id = ? and t.is_deleted = 0 and t.parent_id IS NULL 
                 order by t.created_at desc`;
             const [rows] = await db.execute<RowDataPacket[]>(sql, [projectId]);
-            return rows.map(task => mapTask(task));
+            return rows
         } catch (error) {
             console.error("failed to fetch tasks details from DB!");
             throw error;
@@ -214,6 +214,17 @@ export class TasksRepository {
     async getAssignees(projectId: string): Promise<RowDataPacket[]> {
         try {
             const sql = `select u.id, u.username, u.email_id from project_members p join users u on p.user_id = u.id where p.project_id = ?;`
+            const [result] = await db.execute<RowDataPacket[]>(sql, [projectId]);
+            return result;
+        } catch (error) {
+            console.error("failed to retrieve assignees!");
+            throw error;
+        }
+    }
+    // get assignees from project members using project id
+    async getDependencyTasks(projectId: string): Promise<RowDataPacket[]> {
+        try {
+            const sql = `select id, task_name from project_tasks where project_id = ?;`
             const [result] = await db.execute<RowDataPacket[]>(sql, [projectId]);
             return result;
         } catch (error) {
