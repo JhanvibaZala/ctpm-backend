@@ -128,12 +128,19 @@ export class projectRepository {
   }
 
   // gets all the projects in the workspace
-  async fetchAllProjectsInWorkspace(workspaceId: string): Promise<RowDataPacket[]> {
+  async fetchAllProjectsInWorkspace(workspaceId: string, limit: number, offset: number): Promise<RowDataPacket[]> {
+    const sql = `SELECT * FROM projects WHERE workspace_id = ? ORDER BY created_at desc LIMIT ${limit} OFFSET ${offset};`
+    console.log(workspaceId, limit, offset)
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId]);
+    return rows;
+  }
+
+  // count total pages
+  async countProjectsInWorkspace(workspaceId: string): Promise<RowDataPacket[]> {
     const sql = `
-      SELECT * 
-      FROM projects 
-      WHERE workspace_id = ?
-      ORDER BY created_at desc;
+      SELECT COUNT(*) AS total
+      FROM projects
+      WHERE workspace_id = ?;
     `
     const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId]);
     return rows;
