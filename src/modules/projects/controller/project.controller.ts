@@ -185,6 +185,53 @@ export async function handleDeleteProject(req: AuthRequest, res: Response) {
     console.log(err);
     return res
       .status(500)
-      .json({ msg: "something went wrong project is not deleted" });
+      .json({ success: false, message: "Internal server error" });
+  }
+}
+
+// update project 
+export async function handleUpdateProject(req: AuthRequest, res: Response) {
+   try {
+    const userId = req.user.id;
+    const {projectId, workspaceId} = req.params;
+    if (typeof workspaceId != "string") {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Invalid workspace ID"
+      });
+    }
+    if (typeof projectId != "string") {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Invalid project ID"
+      });
+    }
+
+    const dto = req.body as CreateProjectDto;
+    
+    const service = new ProjectService();
+    const isUpdated = await service.updateProject(workspaceId, projectId, dto);
+    if(!isUpdated.success) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update project"
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Updated succcessfully"
+    })
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Internal server Error"
+      })
   }
 }

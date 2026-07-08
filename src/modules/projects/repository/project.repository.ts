@@ -3,6 +3,7 @@ import db from "../../../config/dbconfig";
 import { Iproject, IprojectMEmber } from "../interfaces/project_obj.interface";
 import { success } from "zod";
 import { ICreateProject } from "../interfaces/createProject.interface";
+import { CreateProjectDto } from "../dto/createProject.dto";
 
 export class projectRepository {
   async insertProject(connection: PoolConnection, project: ICreateProject): Promise<boolean> {
@@ -55,9 +56,9 @@ export class projectRepository {
     `;
 
     await connection.execute(sql, [
-        projectId,
-        userId,
-        roleId
+      projectId,
+      userId,
+      roleId
     ]);
   }
 
@@ -80,9 +81,9 @@ export class projectRepository {
     `;
 
     await connection.execute(sql, [
-        projectId,
-        text,
-        level
+      projectId,
+      text,
+      level
     ]);
   }
   async isWorkspaceMember(
@@ -122,7 +123,7 @@ export class projectRepository {
     `;
     const [rows] =
       await db.execute<RowDataPacket[]>(sql, [
-          workspaceId
+        workspaceId
       ]);
     return rows;
   }
@@ -169,7 +170,7 @@ export class projectRepository {
     const [rows] = await db.execute<RowDataPacket[]>(sql, [workspaceId, projectId]);
     return rows;
   }
-  
+
   // get project members from project id
   async fetchProjectMembers(projectId: string): Promise<RowDataPacket[]> {
     const sql = `
@@ -214,14 +215,14 @@ export class projectRepository {
   }
 
   // delete project stuff
-  async deleteProjectMembers(connection: PoolConnection, projectId : string){
+  async deleteProjectMembers(connection: PoolConnection, projectId: string) {
     const sql = "delete from project_members where project_id = ?"
-    await connection.execute(sql,[projectId])
+    await connection.execute(sql, [projectId])
   }
-  
-  async deleteAllowedTaskStatuses(connection: PoolConnection, projectId : string){
+
+  async deleteAllowedTaskStatuses(connection: PoolConnection, projectId: string) {
     const sql = "delete from allowed_task_statuses where project_id = ?"
-    await connection.execute(sql,[projectId])
+    await connection.execute(sql, [projectId])
   }
 
   async deleteProjectByProjectId(connection: PoolConnection, projectId: string): Promise<boolean> {
@@ -230,117 +231,176 @@ export class projectRepository {
     return result.affectedRows > 0;
   }
 
-  async selectProjectByuserId(user_id: string) {
-    try {
-      const sql =
-        "select p.* from projects p join project_members pm on p.id = pm.project_id where pm.user_id = ?";
-      const result = await db.query(sql, [user_id]);
-      return result;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  }
-  async selectProjectByworkspaceId(workspace_id: string) {
-    try {
-      const sql =
-        "select *,date_format(deadline_at, '%b %d %Y') AS format_deadline from projects where workspace_id = ?";
-      const [result] = await db.execute<RowDataPacket[]>(sql, [workspace_id]);
-      return result;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  }
-  async selectUSersByProjectId(project_id: string) {
-    try {
-      const sql =
-        "select u.* from users u join project_members pm on u.user_id = pm.user_id where pm.project_id = ? ";
-      const result = await db.query(sql, [project_id]);
-      return result;
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  }
-  async getProjectById(project_id: string) {
-    try {
-      const sql = "select * from projects where id = ?";
-      const [result] = await db.execute<RowDataPacket[]>(sql, [project_id]);
-      return result[0];
-    } catch (err) {
-      throw err;
-    }
-  }
+  // edit stuff
+  async updateProject(
+    connection: PoolConnection,
+    projectId: string,
+    dto: CreateProjectDto
+  ): Promise<boolean> {
 
-  async SelectProjectManagerByProjectId(project_id : string){
-    try{
-      const sql = `select pm.project_id,pm.user_id,r.role_name,u.email_id from project_members pm
-       inner join roles r 
-       on pm.role_id=r.id 
-       inner join users u 
-       on pm.user_id=u.id 
-       where pm.project_id=? and r.role_name='project Manager';`
-
-       const [result] = await db.execute<RowDataPacket[]>(sql,[project_id])
-
-       return result
-      
-    }catch(err){
-      throw err;
-    }
-  }
-
-  // this function use to check user is eligible to delete project or not
-  async userRoleForProject(project_id: string, user_id: string) {
-    try {
-      const sql = `select pm.project_id,pm.user_id,pm.role_id,r.role_name from project_members pm
-            left join roles r on pm.role_id=r.id 
-            where pm.project_id=? && pm.user_id=?;`;
-
-      const [result] = await db.execute<RowDataPacket[]>(sql, [
-        project_id,
-        user_id,
-      ]);
-      return result;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  
-
-  async updateProjectByProjectId(project_obj: Iproject) {
-    try {
-      const sql = `
-      UPDATE projects
-      SET
-        project_name = ?,
-        description = ?,
-        priority_level = ?,
-        status = ?,
-        visibility = ?,
-        deadline_at = ?
-      WHERE id = ?
+    const sql = `
+        UPDATE projects
+        SET
+            project_name = ?,
+            description = ?,
+            priority_level = ?,
+            visibility = ?,
+            deadline_at = ?,
+            updated_at = NOW()
+        WHERE id = ?
     `;
 
-      const values = [
-        project_obj.project_name,
-        project_obj.description,
-        project_obj.priority_level,
-        project_obj.status,
-        project_obj.visibility,
-        project_obj.deadline_at,
-        project_obj.project_id, // used in WHERE clause
-      ];
+    const values = [
+      dto.name,
+      dto.description ?? null,
+      dto.priority,
+      dto.visibility,
+      dto.deadlineAt ?? null,
+      projectId,
+    ];
 
-      const [result] = await db.query(sql, values);
-      return result;
-    } catch (err) {
-      console.log("Failed to update project", err);
-      throw err;
-    }
+    const [result] =
+      await connection.query<ResultSetHeader>(
+        sql,
+        values
+      );
+
+    return result.affectedRows > 0;
   }
 
-  
+  async projectExists(
+    connection: PoolConnection,
+    workspaceId: string,
+    projectId: string
+  ): Promise<boolean> {
+
+    const sql = `
+          SELECT id
+          FROM projects
+          WHERE id = ?
+          AND workspace_id = ?
+      `;
+
+    const [rows] =
+      await connection.query<RowDataPacket[]>(
+        sql,
+        [projectId, workspaceId]
+      );
+
+    return rows.length > 0;
+  }
+
+  // async selectProjectByuserId(user_id: string) {
+  //   try {
+  //     const sql =
+  //       "select p.* from projects p join project_members pm on p.id = pm.project_id where pm.user_id = ?";
+  //     const result = await db.query(sql, [user_id]);
+  //     return result;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+  // }
+  // async selectProjectByworkspaceId(workspace_id: string) {
+  //   try {
+  //     const sql =
+  //       "select *,date_format(deadline_at, '%b %d %Y') AS format_deadline from projects where workspace_id = ?";
+  //     const [result] = await db.execute<RowDataPacket[]>(sql, [workspace_id]);
+  //     return result;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+  // }
+  // async selectUSersByProjectId(project_id: string) {
+  //   try {
+  //     const sql =
+  //       "select u.* from users u join project_members pm on u.user_id = pm.user_id where pm.project_id = ? ";
+  //     const result = await db.query(sql, [project_id]);
+  //     return result;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw err;
+  //   }
+  // }
+  // async getProjectById(project_id: string) {
+  //   try {
+  //     const sql = "select * from projects where id = ?";
+  //     const [result] = await db.execute<RowDataPacket[]>(sql, [project_id]);
+  //     return result[0];
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
+
+  // async SelectProjectManagerByProjectId(project_id : string){
+  //   try{
+  //     const sql = `select pm.project_id,pm.user_id,r.role_name,u.email_id from project_members pm
+  //      inner join roles r 
+  //      on pm.role_id=r.id 
+  //      inner join users u 
+  //      on pm.user_id=u.id 
+  //      where pm.project_id=? and r.role_name='project Manager';`
+
+  //      const [result] = await db.execute<RowDataPacket[]>(sql,[project_id])
+
+  //      return result
+
+  //   }catch(err){
+  //     throw err;
+  //   }
+  // }
+
+  // // this function use to check user is eligible to delete project or not
+  // async userRoleForProject(project_id: string, user_id: string) {
+  //   try {
+  //     const sql = `select pm.project_id,pm.user_id,pm.role_id,r.role_name from project_members pm
+  //           left join roles r on pm.role_id=r.id 
+  //           where pm.project_id=? && pm.user_id=?;`;
+
+  //     const [result] = await db.execute<RowDataPacket[]>(sql, [
+  //       project_id,
+  //       user_id,
+  //     ]);
+  //     return result;
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
+
+
+
+  // async updateProjectByProjectId(project_obj: Iproject) {
+  //   try {
+  //     const sql = `
+  //     UPDATE projects
+  //     SET
+  //       project_name = ?,
+  //       description = ?,
+  //       priority_level = ?,
+  //       status = ?,
+  //       visibility = ?,
+  //       deadline_at = ?
+  //     WHERE id = ?
+  //   `;
+
+  //     const values = [
+  //       project_obj.project_name,
+  //       project_obj.description,
+  //       project_obj.priority_level,
+  //       project_obj.status,
+  //       project_obj.visibility,
+  //       project_obj.deadline_at,
+  //       project_obj.project_id, // used in WHERE clause
+  //     ];
+
+  //     const [result] = await db.query(sql, values);
+  //     return result;
+  //   } catch (err) {
+  //     console.log("Failed to update project", err);
+  //     throw err;
+  //   }
+  // }
+
+
 }

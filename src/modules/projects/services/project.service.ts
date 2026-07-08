@@ -233,4 +233,134 @@ export class ProjectService {
     }
   }
 
+  // update project via projevct id
+  async updateProject(
+    workspaceId: string,
+    projectId: string,
+    dto: CreateProjectDto
+) {
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        // Check project exists
+        const exists = await this.projectRepo.projectExists(
+            connection,
+            workspaceId,
+            projectId
+        );
+
+        if (!exists) {
+            await connection.rollback();
+            return {
+                success: false,
+                message: "Project not found",
+            };
+        }
+
+        // Update project
+        const updated = await this.projectRepo.updateProject(
+            connection,
+            projectId,
+            dto
+        );
+
+        if (!updated) {
+            await connection.rollback();
+            return {
+                success: false,
+                message: "Unable to update project",
+            };
+        }
+
+        // Validate project lead
+        const leadExists = await this.projectRepo.isWorkspaceMember(
+            connection,
+            workspaceId,
+            dto.projectLeadId
+        );
+
+        if (!leadExists) {
+            await connection.rollback();
+
+            return {
+                success: false,
+                message: "Project lead must belong to workspace",
+            };
+        }
+
+        // Delete old members
+        await this.projectRepo.deleteProjectMembers(
+            connection,
+            projectId
+        );
+
+        // Insert project lead
+        await this.projectRepo.insertProjectMember(
+            connection,
+            projectId,
+            dto.projectLeadId,
+            3
+        );
+
+        // Insert members
+        for (const memberId of dto.memberIds) {
+
+            if (memberId === dto.projectLeadId)
+                continue;
+
+            const exists = await this.projectRepo.isWorkspaceMember(
+                connection,
+                workspaceId,
+                memberId
+            );
+
+            if (!exists)
+                continue;
+
+            await this.projectRepo.insertProjectMember(
+                connection,
+                projectId,
+                memberId,
+                4
+            );
+        }
+
+        // Delete old statuses
+        await this.projectRepo.deleteAllowedTaskStatuses(
+            connection,
+            projectId
+        );
+
+        // Insert new statuses
+        for (const status of dto.statuses) {
+
+            await this.projectRepo.insertAllowedStatus(
+                connection,
+                projectId,
+                status.text,
+                status.level
+            );
+        }
+
+        await connection.commit();
+
+        return {
+            success: true,
+            message: "Project updated successfully",
+        };
+
+    } catch (error) {
+
+        await connection.rollback();
+        throw error;
+
+    } finally {
+
+        connection.release();
+
+    }
+}
+
 }

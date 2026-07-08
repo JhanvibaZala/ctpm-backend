@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {createProject, fetchMembersInWorkspace, getAllProjects,  getProjectDetails, handleDeleteProject } from "../controller/project.controller";
+import {createProject, fetchMembersInWorkspace, getAllProjects,  getProjectDetails, handleDeleteProject, handleUpdateProject } from "../controller/project.controller";
 const router = Router({ mergeParams: true });
 
 
@@ -8,6 +8,7 @@ router.get("/", getAllProjects)
 router.get("/members", fetchMembersInWorkspace)
 router.get("/:projectId", getProjectDetails);
 router.delete("/:projectId", handleDeleteProject)
+router.patch("/:projectId", handleUpdateProject)
 
 
 export default router;                                                  
