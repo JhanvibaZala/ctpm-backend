@@ -6,7 +6,8 @@ import { CreateProjectDto } from "../dto/createProject.dto";
 import { ICreateProject } from "../interfaces/createProject.interface";
 import { v4 as uuidv4 } from "uuid"
 import db from "../../../config/dbconfig";
-import { mapProjectDetails, mapProjects } from "../mapper/project.mapper";
+import { mapMyProjects, mapProjectDetails, mapProjects } from "../mapper/project.mapper";
+import { MyProjectsResponse } from "../interfaces/project.interface";
 
 export class ProjectService {
   private projectRepo = new projectRepository();
@@ -150,7 +151,6 @@ export class ProjectService {
       const paginationPages: any = await this.projectRepo.countProjectsInWorkspace(workspaceId);
       const total = paginationPages[0].total;
       const offset = (page - 1) * limit;
-      console.log(workspaceId, offset, limit, total)
 
       const result = await this.projectRepo.fetchAllProjectsInWorkspace(workspaceId, limit, offset);
       const totalPages = Math.ceil(total / limit);
@@ -361,6 +361,26 @@ export class ProjectService {
         connection.release();
 
     }
-}
+  }
+  // get my projects
+  async getMyProjectDetails(userId: string, limit: number, page: number): Promise<MyProjectsResponse> {
+    try {
+
+      console.log("fgsvf")
+      const result: any = await this.projectRepo.getMyProjectsCount(userId);
+      const totalProjects = result[0].totalProjects;
+      const offset = (page - 1) * limit;
+      const projects = await this.projectRepo.getMyProjects(userId, limit, offset);
+      
+      return {
+        projects: mapMyProjects(projects),
+        page,
+        limit,
+        hasMore: offset + projects.length < totalProjects
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 
 }

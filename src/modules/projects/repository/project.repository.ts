@@ -290,117 +290,36 @@ export class projectRepository {
     return rows.length > 0;
   }
 
-  // async selectProjectByuserId(user_id: string) {
-  //   try {
-  //     const sql =
-  //       "select p.* from projects p join project_members pm on p.id = pm.project_id where pm.user_id = ?";
-  //     const result = await db.query(sql, [user_id]);
-  //     return result;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-  // }
-  // async selectProjectByworkspaceId(workspace_id: string) {
-  //   try {
-  //     const sql =
-  //       "select *,date_format(deadline_at, '%b %d %Y') AS format_deadline from projects where workspace_id = ?";
-  //     const [result] = await db.execute<RowDataPacket[]>(sql, [workspace_id]);
-  //     return result;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-  // }
-  // async selectUSersByProjectId(project_id: string) {
-  //   try {
-  //     const sql =
-  //       "select u.* from users u join project_members pm on u.user_id = pm.user_id where pm.project_id = ? ";
-  //     const result = await db.query(sql, [project_id]);
-  //     return result;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw err;
-  //   }
-  // }
-  // async getProjectById(project_id: string) {
-  //   try {
-  //     const sql = "select * from projects where id = ?";
-  //     const [result] = await db.execute<RowDataPacket[]>(sql, [project_id]);
-  //     return result[0];
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // }
-
-  // async SelectProjectManagerByProjectId(project_id : string){
-  //   try{
-  //     const sql = `select pm.project_id,pm.user_id,r.role_name,u.email_id from project_members pm
-  //      inner join roles r 
-  //      on pm.role_id=r.id 
-  //      inner join users u 
-  //      on pm.user_id=u.id 
-  //      where pm.project_id=? and r.role_name='project Manager';`
-
-  //      const [result] = await db.execute<RowDataPacket[]>(sql,[project_id])
-
-  //      return result
-
-  //   }catch(err){
-  //     throw err;
-  //   }
-  // }
-
-  // // this function use to check user is eligible to delete project or not
-  // async userRoleForProject(project_id: string, user_id: string) {
-  //   try {
-  //     const sql = `select pm.project_id,pm.user_id,pm.role_id,r.role_name from project_members pm
-  //           left join roles r on pm.role_id=r.id 
-  //           where pm.project_id=? && pm.user_id=?;`;
-
-  //     const [result] = await db.execute<RowDataPacket[]>(sql, [
-  //       project_id,
-  //       user_id,
-  //     ]);
-  //     return result;
-  //   } catch (err) {
-  //     throw err;
-  //   }
-  // }
-
-
-
-  // async updateProjectByProjectId(project_obj: Iproject) {
-  //   try {
-  //     const sql = `
-  //     UPDATE projects
-  //     SET
-  //       project_name = ?,
-  //       description = ?,
-  //       priority_level = ?,
-  //       status = ?,
-  //       visibility = ?,
-  //       deadline_at = ?
-  //     WHERE id = ?
-  //   `;
-
-  //     const values = [
-  //       project_obj.project_name,
-  //       project_obj.description,
-  //       project_obj.priority_level,
-  //       project_obj.status,
-  //       project_obj.visibility,
-  //       project_obj.deadline_at,
-  //       project_obj.project_id, // used in WHERE clause
-  //     ];
-
-  //     const [result] = await db.query(sql, values);
-  //     return result;
-  //   } catch (err) {
-  //     console.log("Failed to update project", err);
-  //     throw err;
-  //   }
-  // }
-
-
+  async getMyProjects(userId: string, limit: number, offset: number) {
+    const sql = `
+      SELECT r.role_name, p.project_name, p.priority_level, p.status, p.visibility, p.created_at, p.deadline_at
+      FROM users u 
+      JOIN project_members pm 
+      ON u.id = pm.user_id 
+      JOIN roles r
+      ON pm.role_id = r.id
+      JOIN projects p
+      ON p.id = pm.project_id
+      where u.id = ?
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [userId]);
+    return rows;
+  }
+  async getMyProjectsCount(userId: string) {
+    const sql = `
+      SELECT COUNT(*) AS totalProjects
+      FROM users u 
+      JOIN project_members pm 
+      ON u.id = pm.user_id 
+      JOIN roles r
+      ON pm.role_id = r.id
+      JOIN projects p
+      ON p.id = pm.project_id
+      where u.id = ?; 
+    `
+    const [rows] = await db.execute<RowDataPacket[]>(sql, [userId]);
+    return rows;
+  }
 }

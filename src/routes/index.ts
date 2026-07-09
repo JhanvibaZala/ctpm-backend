@@ -4,6 +4,7 @@ import authRouter from "../modules/auth/routes/auth.router";
 import dashboardRouter from "../modules/dashboard/routes/dashboard.router";
 import workspacesRouter from "../modules/workspaces/routes/workspaces.router";
 import projectRouter from "../modules/projects/routes/project.router";
+import myProjectRouter from "../modules/projects/routes/myProject.router";
 import authMiddleware from "../middlewares/auth.middleware";
 import projectStatusSync from "../middlewares/projectSync.middleware";
 import loginRouter from "../modules/auth/routes/login.router";
@@ -92,6 +93,13 @@ export function createMasterRouter(
     authMiddleware,
    
     taskRouter,
+  );
+
+  // for all projects 
+  router.use(
+    "/api/projects",
+    authMiddleware,
+    myProjectRouter
   );
   router.use(
     "/api/workspaces/:workspaceId/projects/:projectId/kanban",

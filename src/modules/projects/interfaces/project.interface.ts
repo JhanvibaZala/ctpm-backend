@@ -47,3 +47,26 @@ export interface Project {
   deadlineAt: Date | null;
   completedAt: Date | null;
 }
+
+
+// my project details
+export interface MyProjectsDetailsResponse {  
+  role: string;
+  projectName: string;
+  priorityLevel: string;
+  status: string;
+  visibility: string;
+  createdAt: Date;
+  deadline: Date;
+}
+
+export interface MyProjectsArray {
+  projects: MyProjectsDetailsResponse[];
+}
+
+export interface MyProjectsResponse {
+  projects: MyProjectsDetailsResponse[];
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}

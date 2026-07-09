@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import { IProject, ProjectDetailsResponse } from "../interfaces/project.interface";
+import { IProject, MyProjectsArray, MyProjectsDetailsResponse, ProjectDetailsResponse } from "../interfaces/project.interface";
 
 export function mapProject(row: RowDataPacket): IProject {
   return {
@@ -61,5 +61,35 @@ export function mapProjectDetails(
         level: status.status_level,
       }))
       .sort((a, b) => a.level - b.level),
+  };
+}
+
+
+// my projects mapper
+export function mapMyProject(
+  row: RowDataPacket
+): MyProjectsDetailsResponse {
+  return {
+    role: row.role_name,
+    projectName: row.project_name,
+    priorityLevel: row.priority_level,
+    status: row.status,
+    visibility: row.visibility,
+    createdAt: row.created_at,
+    deadline: row.deadline_at,
+  };
+}
+
+export function mapMyProjects(
+  rows: RowDataPacket[]
+): MyProjectsDetailsResponse[] {
+  return rows.map(mapMyProject);
+}
+
+export function mapMyProjectsResponse(
+  rows: RowDataPacket[]
+): MyProjectsArray {
+  return {
+    projects: mapMyProjects(rows),
   };
 }

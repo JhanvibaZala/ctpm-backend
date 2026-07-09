@@ -235,3 +235,30 @@ export async function handleUpdateProject(req: AuthRequest, res: Response) {
       })
   }
 }
+
+// get all my projects 
+export async function getMyProjects(req: AuthRequest, res:Response) {
+  try {
+    const userId = req.user.id;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const projectService = new ProjectService();
+    const projects = await projectService.getMyProjectDetails(
+      userId,
+      limit,
+      page
+    );
+    console.log(projects)
+    return res.status(200).json({
+      success: true,
+      message: "Fetched user projects successfully",
+      data: projects
+    })
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+  
+}
