@@ -10,7 +10,7 @@ import { AuthUser } from './AuthUser.interface';
 
 export interface AuthRequest extends Request {
     user: AuthUser;
-    taskMembership: { role_name: string } | null;
+    permissions?: string[];
 }
 
 // Extend Express Request type

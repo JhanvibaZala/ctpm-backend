@@ -1,7 +1,7 @@
 import { PoolConnection, ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import db from "../../../config/dbconfig";
 import {
-    AddWorkspaceMember,
+  AddWorkspaceMember,
   ICreateWorkspaceMember,
   IWorkspace,
   WorkspaceDetails,
@@ -69,7 +69,7 @@ export class WorkspacesRepository {
     try {
       const sql = `insert into workspace_members (workspace_id, user_id, role_id, added_by) values (?, ?, ?, ?)`;
       const values = [
-        member.workspaceId, 
+        member.workspaceId,
         member.userId,
         member.roleId,
         member.addedBy,
@@ -174,20 +174,20 @@ export class WorkspacesRepository {
 
   // update the user count in invite codes of WS
   async incrementInviteUsage(inviteId: string) {
-      const sql = `
+    const sql = `
           UPDATE workspace_invite_codes
           SET used_count = used_count + 1
           WHERE id = ?
       `;
 
-      await db.execute(sql, [inviteId]);
-  } 
+    await db.execute(sql, [inviteId]);
+  }
 
   // fetches the data for single workspace
   async fetchWorkspaceDetailsViaId(workspaceId: string, userId: string) {
     try {
       console.log("sdfaksfdbsdf")
-      const sql =`
+      const sql = `
         SELECT w.id, w.workspace_name, w.description, w.created_at, r.role_name AS role,
           (SELECT COUNT(*) FROM workspace_members WHERE workspace_id = w.id) AS totalMembers,
           COUNT(DISTINCT p.id) AS totalProjects,
@@ -216,11 +216,11 @@ export class WorkspacesRepository {
         return null;
       }
       return workspaceDetailsMapper(result[0]);
-      
+
     } catch (error) {
       throw error;
-    }  
-  } 
+    }
+  }
 
   async selectUsersByWorkspaceId(workspace_id: string) {
     try {
@@ -304,64 +304,23 @@ export class WorkspacesRepository {
     }
   }
 
-  async getTeamMemberDetails(workspaceId: string, username: string) {
-    try {
-      const sql = `
-                SELECT 
-    u.id,
-    u.username,
-    u.first_name,
-    u.last_name,
-    u.email_id,
-    u.profile_pic_path,
-    r.role_name,
-    'Workspace Member' AS member_type,
-    NULL AS project_name
-FROM workspace_members wm
-JOIN users u 
-    ON wm.user_id = u.id
-JOIN roles r
-    ON wm.role_id = r.id
-WHERE wm.workspace_id = ?
-AND u.username = ?
+  // workspace.repository.ts
 
+  async isWorkspaceMember(
+    workspaceId: string,
+    userId: string
+  ): Promise<boolean> {
+    const [rows] = await db.query(
+      `
+          SELECT 1
+          FROM workspace_members
+          WHERE workspace_id = ?
+          AND user_id = ?
+          LIMIT 1
+          `,
+      [workspaceId, userId]
+    );
 
-UNION
-
-
-SELECT 
-    u.id,
-    u.username,
-    u.first_name,
-    u.last_name,
-    u.email_id,
-    u.profile_pic_path,
-    r.role_name,
-    'Project Member' AS member_type,
-    p.project_name
-FROM project_members pm
-JOIN projects p
-    ON pm.project_id = p.id
-JOIN users u
-    ON pm.user_id = u.id
-JOIN roles r
-    ON pm.role_id = r.id
-WHERE p.workspace_id = ?
-AND u.username = ?;
-            `;
-      const [result] = await db.execute<RowDataPacket[]>(sql, [
-        workspaceId,
-        username,
-        workspaceId,
-        username,
-      ]);
-      console.log("repo");
-      console.log(workspaceId, username);
-      console.log("Team member details fetched successfully:", result);
-      return result;
-    } catch (error) {
-      console.error("failed to fetch team member details");
-      throw error;
-    }
+    return (rows as RowDataPacket[]).length > 0;
   }
 }

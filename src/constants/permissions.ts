@@ -1,0 +1,76 @@
+// src/constants/permissions.ts
+
+export const PERMISSIONS = {
+  // =========================
+  // Profile
+  // =========================
+  VIEW_SELF_PROFILE: "VIEW_SELF_PROFILE",
+  UPDATE_SELF_PROFILE: "UPDATE_SELF_PROFILE",
+  DELETE_SELF_PROFILE: "DELETE_SELF_PROFILE",
+
+  // =========================
+  // Workspace
+  // =========================
+  CREATE_WORKSPACE: "CREATE_WORKSPACE",
+  DELETE_WORKSPACE: "DELETE_WORKSPACE",
+  VIEW_ALL_WORKSPACES: "VIEW_ALL_WORKSPACES",
+  VIEW_CURRENT_WORKSPACE: "VIEW_CURRENT_WORKSPACE",
+
+  INVITE_USERS_IN_WORKSPACE: "INVITE_USERS_IN_WORKSPACE",
+  KICK_USERS_FROM_WORKSPACE: "KICK_USERS_FROM_WORKSPACE",
+
+  // =========================
+  // Project
+  // =========================
+  CREATE_PROJECT: "CREATE_PROJECT",
+  EDIT_PROJECT: "EDIT_PROJECT",
+  DELETE_PROJECT: "DELETE_PROJECT",
+
+  VIEW_ALL_PROJECTS: "VIEW_ALL_PROJECTS",
+  VIEW_MY_PROJECT: "VIEW_MY_PROJECT",
+  VIEW_ASSIGNED_PROJECTS: "VIEW_ASSIGNED_PROJECTS",
+  VIEW_PUBLIC_PROJECTS: "VIEW_PUBLIC_PROJECTS",
+
+  GENERATE_PROJECT_REPORT: "GENERATE_PROJECT_REPORT",
+
+  // =========================
+  // Project Members
+  // =========================
+  INVITE_TEAM_MEMBER_IN_PROJECT: "INVITE_TEAM_MEMBER_IN_PROJECT",
+  KICK_TEAM_MEMBER_FROM_PROJECT: "KICK_TEAM_MEMBER_FROM_PROJECT",
+
+  // =========================
+  // Task
+  // =========================
+  CREATE_TASK: "CREATE_TASK",
+  EDIT_TASK: "EDIT_TASK",
+  DELETE_TASK: "DELETE_TASK",
+
+  CHANGE_TASK_STATUS: "CHANGE_TASK_STATUS",
+
+  MARK_TASK_COMPLETE: "MARK_TASK_COMPLETE",
+  MARK_TASK_INCOMPLETE: "MARK_TASK_INCOMPLETE",
+
+  LOG_PROGRESS: "LOG_PROGRESS",
+
+  // =========================
+  // Comments
+  // =========================
+  COMMENT: "COMMENT",
+
+  // =========================
+  // Dashboards
+  // =========================
+  VIEW_ADMIN_DASHBOARD: "VIEW_ADMIN_DASHBOARD",
+  VIEW_PROJECT_MANAGER_DASHBOARD: "VIEW_PROJECT_MANAGER_DASHBOARD",
+  VIEW_TEAM_MEMBER_DASHBOARD: "VIEW_TEAM_MEMBER_DASHBOARD",
+  VIEW_CLIENT_DASHBOARD: "VIEW_CLIENT_DASHBOARD",
+
+  // =========================
+  // Account
+  // =========================
+  DELETE_OTHER_ACCOUNT: "DELETE_OTHER_ACCOUNT",
+} as const;
+
+export type Permission =
+  (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

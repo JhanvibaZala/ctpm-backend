@@ -198,15 +198,15 @@ export class WorkspaceService{
         }
     }
 
-    // get details of a specific team member
-    async getTeamMemberDetails(workspaceId: string, username: string) {
-        try {
-            const memberDetails = await this.workspaceRepo.getTeamMemberDetails(workspaceId, username);
-            console.log("Member details fetched successfully:", memberDetails);
-            return memberDetails;
-        } catch (error) {
-            console.error("Error fetching team member details:", error);
-            return false;
-        }
+    // workspace.service.ts
+
+    async isWorkspaceMember(
+        workspaceId: string,
+        userId: string
+    ): Promise<boolean> {
+        return this.workspaceRepo.isWorkspaceMember(
+            workspaceId,
+            userId
+        );
     }
 }

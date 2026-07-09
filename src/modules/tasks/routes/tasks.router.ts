@@ -5,6 +5,8 @@ import { handleMulterError } from "../../../middlewares/handleMulterError";
 import { addSubtask, getDataForSubtasks } from "../contoller/subtask.controller";
 import checkWorkspacePermission from "../../../middlewares/workspacePermCheck.middleware";
 import checkProjectPermission from "../../../middlewares/projectPermCheck.middleware";
+import { PERMISSIONS } from "../../../constants/permissions";
+import { authorize } from "../../../middlewares/authorize";
 
 const router = Router({
     mergeParams: true
@@ -14,7 +16,7 @@ const router = Router({
 router.get("/", getTasks);
 router.post("/", upload.array("attachments", 10), handleMulterError, createTask);
 router.get("/get-data", getCreateData)
-router.delete("/:taskId", deleteTask);
+router.delete("/:taskId", authorize(PERMISSIONS.EDIT_TASK), deleteTask);
 // router.get("/statuses/get",checkProjectPermission("VIEW_PUBLIC_PROJECTS"), getStatuses);
 // router.get("/members",checkProjectPermission("INVITE_TEAM_MEMBER_IN_PROJECT"), getAssignees);
 // router.get("/:taskId",checkProjectPermission("VIEW_PUBLIC_PROJECTS") ,getTask);

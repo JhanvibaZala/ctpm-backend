@@ -13,6 +13,8 @@ import {
 // import { getProjectByworkspaceId } from "../../projects/controller/project.controller";
 
 import checkWorkspacePermission from "../../../middlewares/workspacePermCheck.middleware";
+import { authorize } from "../../../middlewares/authorize";
+import { PERMISSIONS } from "../../../constants/permissions";
 const router = Router({ mergeParams: true });
 
 // router.get("/:workspaceId/dashboard",checkWorkspacePermission("VIEW_TEAM_MEMBER_DASHBOARD"), showDashboard);

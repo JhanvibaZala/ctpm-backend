@@ -47,6 +47,8 @@ import checkWorkspacePermission from "../middlewares/workspacePermCheck.middlewa
 
 import { Pool } from "mysql2/promise"; // Ensure you import your type
 import { validateProjectAccess } from "../middlewares/project.middleware";
+import { loadWorkspacePermissions } from "../middlewares/loadWorkspacePermissions";
+import { checkWorkspaceMembership } from "../middlewares/checkWorkspaceMembership.middleware";
 
 // Wrap your central router inside an initialization factory
 export function createMasterRouter(
@@ -86,12 +88,14 @@ export function createMasterRouter(
   router.use(
     "/api/workspaces/:workspaceId/projects",
     authMiddleware,
+    checkWorkspaceMembership,
+    loadWorkspacePermissions,
     projectRouter,
   );
   router.use(
     "/api/workspaces/:workspaceId/projects/:projectId/tasks",
     authMiddleware,
-   
+    loadWorkspacePermissions,
     taskRouter,
   );
 
