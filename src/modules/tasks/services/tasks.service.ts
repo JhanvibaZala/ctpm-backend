@@ -239,16 +239,16 @@ export class TaskService {
         }
     }
 
-    // // delete task - soft delete
-    // async deleteTask(taskId: string): Promise<boolean> {
-    //     try {
-    //         const deleted = await this.tasksRepo.deleteTask(taskId);
-    //         return deleted;
-    //     } catch(error){
-    //         console.error("Error in delete task service:", error);
-    //         throw error;
-    //     }
-    // }
+    // delete task - soft delete
+    async deleteTask(taskId: string): Promise<boolean> {
+        try {
+            const deleted = await this.tasksRepo.deleteTask(taskId);
+            return deleted;
+        } catch(error){
+            console.error("Error in delete task service:", error);
+            throw error;
+        }
+    }
 
     // // get edit data for task
     // async getEditData(projectId: string, taskId: string) {

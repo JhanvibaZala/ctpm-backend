@@ -390,35 +390,35 @@ export const getTask = async (req: AuthRequest, res: Response) => {
 //   }
 // };
 
-// export const deleteTask = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const taskId = req.params.taskId;
-//     if (typeof taskId !== "string") {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid task id",
-//       });
-//     }
+export const deleteTask = async (req: AuthRequest, res: Response) => {
+  try {
+    const taskId = req.params.taskId;
+    if (typeof taskId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid task id",
+      });
+    }
 
-//     const taskService = new TaskService();
-//     const deleted = await taskService.deleteTask(taskId);
+    const taskService = new TaskService();
+    const deleted = await taskService.deleteTask(taskId);
 
-//     if (!deleted) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Task not found or already deleted",
-//       });
-//     }
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found or already deleted",
+      });
+    }
 
-//     return res.status(200).json({
-//       success: true,
-//       message: "Task deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("Delete task controller error:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Internal server error",
-//     });
-//   }
-// };
+    return res.status(200).json({
+      success: true,
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete task controller error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
