@@ -20,5 +20,20 @@ export class PermissionService {
             
         return mapPermissions(permissions);
     }
+    async getProjectPermissions(
+        workspaceId: string,
+        projectId: string,
+        userId: string
+    ){
+
+        const permissions =
+            await this.permissionRepo.getProjectPermissions(
+                workspaceId,
+                projectId,
+                userId,
+            );
+            
+        return mapPermissions(permissions);
+    }
 
 }

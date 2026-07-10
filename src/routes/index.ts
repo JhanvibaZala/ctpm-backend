@@ -21,32 +21,8 @@ import ganttRouter from "../modules/gantt_chart/routes/gantt.routes";
 import calendarRouter from "../modules/calendar/routes/calendar.router";
 import burnUpBurnDownRouter from "../modules/burnup_burndown/routes/burnup_burndown.routes";
 
-import checkProjectPermission from "../middlewares/projectPermCheck.middleware";
-import checkWorkspacePermission from "../middlewares/workspacePermCheck.middleware";
-
-// const router = Router()
-
-// router.get("/",(req,res)=>{
-//     res.redirect("/register")
-// })
-
-// router.use("/register",registerRouter)
-// router.use("/login",loginRouter)
-// router.use("/forgot-password",forgotPasswordRouter)
-// router.use("/reset-password",resetPasswordRouter)
-// router.use("/otp", otpRouter)
-// router.use("/auth", authRouter)
-// router.use("/gmail", gmailRouter)
-// router.use("/dashboard", dashboardRouter) // add middleware here later to protect this route
-// router.use("/api/workspaces", workspacesRouter) // add middleware here later to protect this route
-// router.use("/tasks", taskRouter);
-// // router.use("/tasks/:taskId/comments",createCommentRouter(db, deps));
-// router.use(errorHandler);
-
-// export default router
 
 import { Pool } from "mysql2/promise"; // Ensure you import your type
-import { validateProjectAccess } from "../middlewares/project.middleware";
 import { loadWorkspacePermissions } from "../middlewares/loadWorkspacePermissions";
 import { checkWorkspaceMembership } from "../middlewares/checkWorkspaceMembership.middleware";
 
@@ -77,6 +53,8 @@ export function createMasterRouter(
   router.use(
     "/api/workspaces",
     authMiddleware,
+    checkWorkspaceMembership,
+    loadWorkspacePermissions,
     workspacesRouter,
   ); // add middleware here later to protect this route
 
@@ -92,9 +70,11 @@ export function createMasterRouter(
     loadWorkspacePermissions,
     projectRouter,
   );
+
   router.use(
     "/api/workspaces/:workspaceId/projects/:projectId/tasks",
     authMiddleware,
+    checkWorkspaceMembership,
     loadWorkspacePermissions,
     taskRouter,
   );
