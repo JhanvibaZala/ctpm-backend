@@ -53,7 +53,6 @@ export function createMasterRouter(
   router.use(
     "/api/workspaces",
     authMiddleware,
-    checkWorkspaceMembership,
     loadWorkspacePermissions,
     workspacesRouter,
   ); // add middleware here later to protect this route
