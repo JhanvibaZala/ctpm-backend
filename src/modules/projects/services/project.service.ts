@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid"
 import db from "../../../config/dbconfig";
 import { mapMyProjects, mapProjectDetails, mapProjects } from "../mapper/project.mapper";
 import { MyProjectsResponse } from "../interfaces/project.interface";
+import { UpdateProjectDto } from "../dto/updateProject.dto";
 
 export class ProjectService {
   private projectRepo = new projectRepository();
@@ -237,13 +238,12 @@ export class ProjectService {
   async updateProject(
     workspaceId: string,
     projectId: string,
-    dto: CreateProjectDto
+    dto: UpdateProjectDto
 ) {
     const connection = await db.getConnection();
 
     try {
-        await connection.beginTransaction();
-
+      await connection.beginTransaction();
         // Check project exists
         const exists = await this.projectRepo.projectExists(
             connection,
@@ -275,73 +275,78 @@ export class ProjectService {
         }
 
         // Validate project lead
-        const leadExists = await this.projectRepo.isWorkspaceMember(
+        if(dto.projectLeadId) {
+
+          const leadExists = await this.projectRepo.isWorkspaceMember(
             connection,
             workspaceId,
             dto.projectLeadId
-        );
-
-        if (!leadExists) {
-            await connection.rollback();
-
-            return {
-                success: false,
-                message: "Project lead must belong to workspace",
-            };
+          );
+          if (!leadExists) {
+              await connection.rollback();
+  
+              return {
+                  success: false,
+                  message: "Project lead must belong to workspace",
+              };
+          }
         }
-
-        // Delete old members
-        await this.projectRepo.deleteProjectMembers(
-            connection,
-            projectId
-        );
-
-        // Insert project lead
-        await this.projectRepo.insertProjectMember(
-            connection,
-            projectId,
-            dto.projectLeadId,
-            3
-        );
 
         // Insert members
-        for (const memberId of dto.memberIds) {
-
+        if (dto.memberIds !== undefined && dto.projectLeadId !== undefined) {
+          // Delete old members
+          await this.projectRepo.deleteProjectMembers(
+              connection,
+              projectId
+          );
+          // Insert project lead
+          await this.projectRepo.insertProjectMember(
+              connection,
+              projectId,
+              dto.projectLeadId,
+              3
+          );
+          
+          for (const memberId of dto.memberIds) {
+            
             if (memberId === dto.projectLeadId)
-                continue;
-
+              continue;
+            
             const exists = await this.projectRepo.isWorkspaceMember(
-                connection,
-                workspaceId,
-                memberId
+              connection,
+              workspaceId,
+              memberId
             );
-
+            
             if (!exists)
-                continue;
-
+              continue;
+            
             await this.projectRepo.insertProjectMember(
-                connection,
-                projectId,
-                memberId,
-                4
+              connection,
+              projectId,
+              memberId,
+              4
             );
+          }
         }
 
-        // Delete old statuses
-        await this.projectRepo.deleteAllowedTaskStatuses(
-            connection,
-            projectId
-        );
-
+        
         // Insert new statuses
-        for (const status of dto.statuses) {
-
-            await this.projectRepo.insertAllowedStatus(
-                connection,
-                projectId,
-                status.text,
-                status.level
-            );
+        if(dto.statuses) {
+          // Delete old statuses
+          await this.projectRepo.deleteAllowedTaskStatuses(
+              connection,
+              projectId
+          );
+          for (const status of dto.statuses) {
+  
+              await this.projectRepo.insertAllowedStatus(
+                  connection,
+                  projectId,
+                  status.text,
+                  status.level
+              );
+          }
         }
 
         await connection.commit();

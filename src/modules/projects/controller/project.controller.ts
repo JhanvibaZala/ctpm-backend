@@ -2,6 +2,7 @@ import {  Response } from "express";
 import { ProjectService } from "../services/project.service";
 import { AuthRequest } from "../../../common/interfaces/AuthRequest.interface";
 import { CreateProjectDto } from "../dto/createProject.dto";
+import { UpdateProjectDto } from "../dto/updateProject.dto";
 
 // create project
 export async function createProject(req: AuthRequest, res: Response) {
@@ -211,7 +212,7 @@ export async function handleUpdateProject(req: AuthRequest, res: Response) {
       });
     }
 
-    const dto = req.body as CreateProjectDto;
+    const dto = req.body as UpdateProjectDto;
     
     const service = new ProjectService();
     const isUpdated = await service.updateProject(workspaceId, projectId, dto);

@@ -4,6 +4,7 @@ import { Iproject, IprojectMEmber } from "../interfaces/project_obj.interface";
 import { success } from "zod";
 import { ICreateProject } from "../interfaces/createProject.interface";
 import { CreateProjectDto } from "../dto/createProject.dto";
+import { UpdateProjectDto } from "../dto/updateProject.dto";
 
 export class projectRepository {
   async insertProject(connection: PoolConnection, project: ICreateProject): Promise<boolean> {
@@ -235,35 +236,56 @@ export class projectRepository {
   async updateProject(
     connection: PoolConnection,
     projectId: string,
-    dto: CreateProjectDto
+    dto: UpdateProjectDto
   ): Promise<boolean> {
 
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    if (dto.name !== undefined) {
+      fields.push("project_name = ?");
+      values.push(dto.name);
+    }
+
+    if (dto.description !== undefined) {
+      fields.push("description = ?");
+      values.push(dto.description);
+    }
+
+    if (dto.priority !== undefined) {
+      fields.push("priority_level = ?");
+      values.push(dto.priority);
+    }
+
+    if (dto.visibility !== undefined) {
+      fields.push("visibility = ?");
+      values.push(dto.visibility);
+    }
+
+    if (dto.deadlineAt !== undefined) {
+      fields.push("deadline_at = ?");
+      values.push(dto.deadlineAt);
+    }
+
+    // Nothing to update
+    if (fields.length === 0) {
+      return true;
+    }
+
+    fields.push("updated_at = NOW()");
+
     const sql = `
-        UPDATE projects
-        SET
-            project_name = ?,
-            description = ?,
-            priority_level = ?,
-            visibility = ?,
-            deadline_at = ?,
-            updated_at = NOW()
-        WHERE id = ?
-    `;
+    UPDATE projects
+    SET ${fields.join(", ")}
+    WHERE id = ?
+  `;
 
-    const values = [
-      dto.name,
-      dto.description ?? null,
-      dto.priority,
-      dto.visibility,
-      dto.deadlineAt ?? null,
-      projectId,
-    ];
+    values.push(projectId);
 
-    const [result] =
-      await connection.query<ResultSetHeader>(
-        sql,
-        values
-      );
+    const [result] = await connection.query<ResultSetHeader>(
+      sql,
+      values
+    );
 
     return result.affectedRows > 0;
   }
