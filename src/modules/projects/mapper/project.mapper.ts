@@ -70,6 +70,8 @@ export function mapMyProject(
   row: RowDataPacket
 ): MyProjectsDetailsResponse {
   return {
+    id: row.id,
+    workspaceId: row.workspace_id,
     role: row.role_name,
     projectName: row.project_name,
     priorityLevel: row.priority_level,

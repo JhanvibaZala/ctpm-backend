@@ -292,7 +292,7 @@ export class projectRepository {
 
   async getMyProjects(userId: string, limit: number, offset: number) {
     const sql = `
-      SELECT r.role_name, p.project_name, p.priority_level, p.status, p.visibility, p.created_at, p.deadline_at
+      SELECT p.id, p.workspace_id, r.role_name, p.project_name, p.priority_level, p.status, p.visibility, p.created_at, p.deadline_at
       FROM users u 
       JOIN project_members pm 
       ON u.id = pm.user_id 

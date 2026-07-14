@@ -51,6 +51,8 @@ export interface Project {
 
 // my project details
 export interface MyProjectsDetailsResponse {  
+  id: string;
+  workspaceId: string;
   role: string;
   projectName: string;
   priorityLevel: string;
